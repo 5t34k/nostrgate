@@ -1,0 +1,5127 @@
+<!--
+  NostrGate // Step into the open web
+  https://github.com/5t34k/nostrgate
+  https://nostrgate.com
+
+  Built by 5t34k (npub1x5t34kxd79m657qcuwp4zrypy9t8t4e6yks5zapjvau29t0xvgaqakh2p2)
+
+  MIT License
+  Copyright (c) 2026 5t34k
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NostrGate - A window into the open web</title>
+  <meta name="description" content="View profiles, posts, articles and live streams from the decentralized Nostr network. No account needed.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="NostrGate - Step into the open web">
+  <meta property="og:description" content="View profiles, posts, articles and live streams from the decentralized Nostr network. No account needed.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://nostrgate.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://nostrgate.com/og-image.png">
+  <meta property="og:site_name" content="NostrGate">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwYTBhMGEiIHJ4PSI1Ii8+CiAgPHBvbHlnb24gcG9pbnRzPSIxNiwyIDI4LDkgMjgsMjMgMTYsMzAgNCwyMyA0LDkiIGZpbGw9IiNlOGZmNDciLz4KICA8cG9seWdvbiBwb2ludHM9IjE5LDUgMTEsMTggMTYsMTggMTMsMjcgMjEsMTQgMTYsMTQiIGZpbGw9IiMwYTBhMGEiLz4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxLjgiIGZpbGw9IiNlOGZmNDciLz4KPC9zdmc+">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --border: #2a2a2a;
+      --accent: #e8ff47;
+      --accent2: #ff6b35;
+      --text: #f0f0f0;
+      --muted: #666;
+      --muted2: #444;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* -- NOISE OVERLAY -- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* -- HEADER -- */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .logo span { color: var(--text); }
+
+    .header-search {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .header-search input {
+      background: var(--surface2);
+      border: 1px solid #3a3a3a;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      width: 280px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .header-search input:focus { border-color: var(--accent); }
+    .header-search input::placeholder { color: #555; }
+
+    .btn-sm {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.75rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: opacity 0.15s;
+    }
+    .btn-sm:hover { opacity: 0.85; }
+
+    /* -- VIEWS -- */
+    #view-home, #view-entity, #view-loading, #view-error, #view-about {
+      display: none;
+      padding-top: 80px;
+    }
+    #view-home.active, #view-entity.active, #view-loading.active, #view-error.active, #view-about.active {
+      display: block;
+    }
+
+    /* -- HOME PAGE -- */
+    .home-hero {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .home-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s forwards;
+    }
+
+    .home-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 14vw, 11rem);
+      line-height: 0.9;
+      letter-spacing: -0.01em;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+
+    .home-title .line2 {
+      color: var(--accent);
+      display: block;
+    }
+
+    .home-desc {
+      font-size: 1.1rem;
+      color: #999;
+      max-width: 520px;
+      margin-bottom: 3rem;
+      font-weight: 300;
+      line-height: 1.7;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.3s forwards;
+    }
+
+    .home-desc strong { color: var(--text); font-weight: 500; }
+
+    .search-bar {
+      display: flex;
+      gap: 0;
+      max-width: 620px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.4s forwards;
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-right: none;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      padding: 1rem 1.2rem;
+      border-radius: 6px 0 0 6px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar input::placeholder { color: var(--muted); }
+
+    .search-bar button {
+      background: var(--accent);
+      color: #000;
+      border: 2px solid var(--accent);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      padding: 1rem 1.8rem;
+      border-radius: 0 6px 6px 0;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .search-bar button:hover {
+      background: transparent;
+      color: var(--accent);
+    }
+
+    .home-hints {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1.2rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.5s forwards;
+    }
+
+    .hint-chip {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.6rem;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+    }
+
+    .home-features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-top: 5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.6s forwards;
+    }
+
+    /* -- LOADING -- */
+    .loading-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 80px);
+      gap: 1.5rem;
+    }
+
+    .gate-loader {
+      display: inline-block;
+      position: relative;
+    }
+    .gate-loader svg { display: block; }
+    .gate-loader .gate-frame {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .gate-loader .gate-pulse {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 22 200;
+      stroke-dashoffset: 0;
+      filter: drop-shadow(0 0 4px var(--accent));
+      animation: gatePulse 1.4s ease-in-out infinite alternate;
+    }
+
+    /* Default: full-page loader */
+    .gate-loader         { width: 28px; height: 36px; }
+    /* Small: in-feed, tabs */
+    .gate-loader-sm      { width: 16px; height: 20px; }
+    .gate-loader-sm .gate-pulse { stroke-width: 2; filter: drop-shadow(0 0 3px var(--accent)); }
+    /* Medium: zap modal etc */
+    .gate-loader-md      { width: 22px; height: 28px; }
+
+    .loading-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+    }
+
+    /* -- ERROR -- */
+    .error-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 5rem 2rem 4rem;
+      animation: fadeUp 0.5s forwards;
+    }
+
+    .error-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent2);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    .error-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      line-height: 0.92;
+      letter-spacing: 0.02em;
+      margin-bottom: 2rem;
+    }
+    .error-title .line-dim { color: var(--muted2); }
+    .error-title .line-accent { color: var(--accent); }
+
+    .error-lead {
+      font-size: 1rem;
+      color: #888;
+      line-height: 1.75;
+      max-width: 540px;
+      margin-bottom: 2.5rem;
+    }
+
+    .error-msg-detail {
+      display: inline-block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: #bbb;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
+      border-radius: 0 6px 6px 0;
+      padding: 0.7rem 1rem;
+      margin-bottom: 2.5rem;
+      max-width: 560px;
+      word-break: break-word;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 4rem;
+    }
+
+    .btn-back {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      padding: 0.75rem 2rem;
+      background: var(--accent);
+      color: #000;
+      border: 2px solid var(--accent);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-back:hover { background: transparent; color: var(--accent); }
+
+    .error-reasons {
+      border-top: 1px solid var(--border);
+      padding-top: 2.5rem;
+    }
+
+    .error-reasons-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 1.2rem;
+    }
+
+    .error-reasons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .error-reason {
+      background: var(--bg);
+      padding: 1.5rem;
+    }
+
+    .error-reason-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      color: var(--muted2);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .error-reason-title {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+
+    .error-reason-desc {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px) {
+      .error-wrap { padding: 3rem 1.2rem 3rem; }
+      .error-reasons-grid { grid-template-columns: 1fr; }
+    }
+
+    /* -- ENTITY PAGE -- */
+    .entity-wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+      animation: fadeUp 0.4s forwards;
+    }
+
+    /* Note two-column layout on desktop */
+    .note-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+      align-items: start;
+      animation: fadeUp 0.4s forwards;
+    }
+
+    .note-main {
+      padding-right: 3rem;
+      border-right: 1px solid var(--border);
+      min-width: 0;
+    }
+
+    .note-sidebar {
+      padding-left: 2rem;
+      position: sticky;
+      top: 100px;
+    }
+
+    .sidebar-section { margin-bottom: 2rem; }
+
+    .sidebar-label {
+      font-family: "DM Mono", monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-author { display: flex; flex-direction: column; gap: 0.8rem; }
+
+    .sidebar-author-top {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    .sidebar-author-top:hover .sidebar-author-name { color: var(--accent); }
+
+    .sidebar-avatar,
+    .sidebar-avatar-placeholder {
+      width: 48px; height: 48px; border-radius: 8px;
+      background: var(--surface2); flex-shrink: 0;
+      border: 2px solid var(--border); transition: border-color 0.15s;
+    }
+    .sidebar-avatar { object-fit: cover; }
+    .sidebar-avatar-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      font-family: "Bebas Neue", sans-serif; font-size: 1.4rem; color: var(--muted);
+    }
+    .sidebar-author-top:hover .sidebar-avatar,
+    .sidebar-author-top:hover .sidebar-avatar-placeholder { border-color: var(--accent); }
+
+    .sidebar-author-name {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.2rem; letter-spacing: 0.04em;
+      line-height: 1.1; transition: color 0.15s;
+    }
+
+    .sidebar-author-nip05 {
+      font-family: "DM Mono", monospace;
+      font-size: 0.65rem; color: var(--accent);
+      word-break: break-word;
+    }
+
+    .sidebar-author-about {
+      font-size: 0.8rem; color: #888; line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    .sidebar-timestamp {
+      font-family: "DM Mono", monospace;
+      font-size: 0.72rem; color: var(--muted); line-height: 1.6;
+    }
+    .sidebar-timestamp .ts-date {
+      font-size: 1rem; color: var(--text);
+      font-family: "Bebas Neue", sans-serif;
+      letter-spacing: 0.06em; display: block; margin-bottom: 0.1rem;
+    }
+
+    .sidebar-id {
+      font-family: "DM Mono", monospace; font-size: 0.62rem;
+      color: #444; word-break: break-all; line-height: 1.5;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 4px; padding: 0.6rem 0.7rem;
+    }
+
+    .sidebar-clients { display: flex; flex-direction: column; gap: 0.4rem; }
+    .sidebar-clients .client-btn { justify-content: flex-start; font-size: 0.78rem; padding: 0.45rem 0.8rem; }
+
+    @media (max-width: 860px) {
+      .note-layout {
+        grid-template-columns: 1fr;
+        padding: 2rem 1.2rem 5rem;
+      }
+      .note-main {
+        padding-right: 0; border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 2rem; margin-bottom: 2rem;
+      }
+      .note-sidebar {
+        padding-left: 0; position: static;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+      }
+      .sidebar-author-section { display: none; }
+    }
+
+    @media (max-width: 560px) {
+      .note-sidebar { grid-template-columns: 1fr; }
+    }
+
+    /* Profile */
+    .profile-banner {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: -60px;
+      background: linear-gradient(135deg, var(--surface2), var(--surface));
+      display: block;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: flex-end;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+      padding-top: 10px;
+    }
+
+    .profile-avatar,
+    .profile-avatar-placeholder {
+      width: 90px; height: 90px; border-radius: 8px;
+      border: 3px solid var(--bg); background: var(--surface2); flex-shrink: 0;
+    }
+    .profile-avatar { object-fit: cover; }
+    .profile-avatar-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--muted);
+    }
+
+    .profile-name-block { padding-bottom: 0.25rem; }
+
+    .profile-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    .profile-nip05 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      margin-top: 0.2rem;
+      word-break: break-word;
+    }
+    .nip05-pending .nip05-check { opacity: 0.4; }
+    .nip05-verified .nip05-check { color: var(--accent); }
+    .nip05-failed .nip05-check { color: var(--muted); }
+    .nip05-failed .nip05-domain { color: var(--muted); text-decoration: line-through; }
+
+    .profile-about {
+      font-size: 0.95rem;
+      color: #aaa;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .profile-about-empty {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .profile-meta {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .meta-item {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      word-break: break-all;
+    }
+    .meta-item a { color: var(--accent); text-decoration: none; }
+    .meta-item a:hover { text-decoration: underline; }
+
+    /* Note */
+    .note-header {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .note-avatar,
+    .note-avatar-placeholder {
+      width: 44px; height: 44px; border-radius: 6px;
+      background: var(--surface2); flex-shrink: 0;
+    }
+    .note-avatar { object-fit: cover; }
+    .note-avatar-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--muted);
+    }
+
+    .note-author-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .note-header-link {
+      cursor: pointer;
+      border-radius: 6px;
+      padding: 0.3rem;
+      margin: -0.3rem;
+      transition: background 0.15s;
+    }
+    .note-header-link:hover { background: var(--surface2); }
+    .note-header-link:hover .note-author-name { color: var(--accent); }
+
+    /* -- NOTE MAIN AUTHOR HEADER -- */
+    .note-main-author {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: inherit;
+      padding: 0.5rem 0.6rem;
+      margin: -0.5rem -0.6rem;
+      border-radius: 8px;
+      transition: background 0.15s;
+      margin-bottom: 0;
+    }
+    .note-main-author:hover { background: var(--surface2); }
+    .note-main-author:hover .note-main-name { color: var(--accent); }
+
+    .note-main-avatar,
+    .note-main-avatar-placeholder {
+      width: 46px; height: 46px; border-radius: 8px;
+      background: var(--surface2); flex-shrink: 0;
+      border: 2px solid var(--border); transition: border-color 0.15s;
+    }
+    .note-main-avatar { object-fit: cover; }
+    .note-main-avatar-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; color: var(--muted);
+    }
+    .note-main-author:hover .note-main-avatar,
+    .note-main-author:hover .note-main-avatar-placeholder { border-color: var(--accent); }
+
+    .note-main-author-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .note-main-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.35rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      transition: color 0.15s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .note-main-nip05 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+      word-break: break-word;
+    }
+
+    .note-main-time {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      white-space: nowrap;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .note-main-divider {
+      height: 1px;
+      background: linear-gradient(to right, var(--accent) 0%, var(--border) 40%, transparent 100%);
+      margin: 1rem 0 0;
+      opacity: 0.6;
+    }
+
+    .note-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem 1.6rem;
+      margin-top: 0;
+    }
+
+    .note-timestamp {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .note-content {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: #ddd;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 1.5rem;
+    }
+
+    .note-content a,
+    a.inline-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.88em;
+      word-break: break-all;
+    }
+    .note-content a:hover,
+    a.inline-link:hover { text-decoration: underline; }
+
+    /* Long form */
+    .longform-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      line-height: 1;
+      letter-spacing: 0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .longform-summary {
+      font-size: 1rem;
+      color: #888;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .longform-body {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #ccc;
+    }
+
+    .longform-body h1, .longform-body h2, .longform-body h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      margin: 2rem 0 0.75rem;
+    }
+    .longform-body h1 { font-size: 2.5rem; }
+    .longform-body h2 { font-size: 2rem; }
+    .longform-body h3 { font-size: 1.5rem; }
+    .longform-body p { margin-bottom: 1rem; }
+    .longform-body a { color: var(--accent); }
+    .longform-body code {
+      font-family: 'DM Mono', monospace;
+      background: var(--surface2);
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      font-size: 0.85em;
+    }
+    .longform-body pre {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+    }
+    .longform-body pre code { background: none; padding: 0; }
+    .longform-body img { max-width: 100%; border-radius: 6px; margin: 1rem 0; }
+    .longform-body blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 1rem;
+      color: #888;
+      margin: 1.2rem 0;
+    }
+    .longform-body ul, .longform-body ol {
+      margin: 1rem 0;
+      padding-left: 1.5rem;
+    }
+    .longform-body li {
+      margin-bottom: 0.4rem;
+    }
+
+    /* Live event */
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--accent2);
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      padding: 0.25rem 0.6rem;
+      border-radius: 3px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      animation: pulse 1.2s infinite;
+    }
+
+    .live-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .live-summary {
+      font-size: 0.95rem;
+      color: #888;
+      margin-bottom: 1.5rem;
+    }
+
+    /* -- DIVIDER -- */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    /* -- CLIENT PICKER -- */
+    .client-section {
+      margin-top: 2.5rem;
+    }
+
+    .client-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .client-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .client-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+
+    .client-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #000;
+    }
+
+    .client-btn.primary {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    .client-btn.primary:hover {
+      background: var(--text);
+      border-color: var(--text);
+    }
+
+    .client-btn .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.5;
+    }
+
+    .client-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: transparent;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .client-more-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .client-more-btn .chevron { transition: transform 0.2s; display: inline-block; }
+    .client-more-btn.open .chevron { transform: rotate(180deg); }
+
+    .client-extra {
+      display: none;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .client-extra.open { display: flex; }
+
+    /* -- RAW ID -- */
+    .raw-id-block {
+      margin-top: 2rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.2rem;
+    }
+
+    .raw-id-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .raw-id-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: #666;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    /* -- ACCENT STRIPE -- */
+    .accent-stripe {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 100vh;
+      background: linear-gradient(to bottom, var(--accent) 0%, var(--accent2) 60%, transparent 100%);
+      opacity: 0.6;
+    }
+
+    /* -- MEDIA -- */
+    .media-block {
+      margin: 0.8rem 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .inline-img {
+      max-width: 100%;
+      max-height: 520px;
+      object-fit: contain;
+      border-radius: 8px;
+      display: block;
+      margin: 0.5rem 0;
+      background: var(--surface2);
+    }
+    .inline-video {
+      max-width: 100%;
+      border-radius: 8px;
+      display: block;
+      background: #000;
+    }
+    .inline-audio { width: 100%; margin: 0.5rem 0; }
+    .media-embed {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .media-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* -- NOSTR MENTIONS -- */
+    a.nostr-mention {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    a.nostr-mention:hover { text-decoration: underline; }
+
+    /* -- QUOTE CARDS -- */
+    .quote-ref { margin: 0.8rem 0; }
+    .quote-loading {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      padding: 0.8rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .quote-spinner {
+      display: inline-block;
+      width: 10px;
+      height: 13px;
+      flex-shrink: 0;
+      vertical-align: middle;
+    }
+    .quote-spinner svg { display: block; width: 100%; height: 100%; }
+    .quote-spinner .gate-frame { fill: none; stroke: var(--border); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .quote-spinner .gate-pulse { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 22 200; filter: drop-shadow(0 0 3px var(--accent)); animation: gatePulse 1.4s ease-in-out infinite alternate; }
+    .quote-missing {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      padding: 0.6rem 1rem;
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+    }
+    .quote-card {
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      padding: 0.9rem 1rem;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .quote-card:hover { border-color: var(--accent); background: var(--surface2); }
+    .quote-author {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .quote-avatar { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; }
+    .quote-name { font-weight: 500; font-size: 0.8rem; }
+    .quote-time { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-left: auto; }
+    .quote-text { font-size: 0.85rem; color: #bbb; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+
+    /* -- PROFILE FEED -- */
+    .feed-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .feed-tab {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      padding: 0.5rem 1.2rem 0.6rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
+      user-select: none;
+    }
+    .feed-tab:hover { color: var(--text); }
+    .feed-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .feed-loading { padding: 2rem 0; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+    .feed-empty { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--muted); padding: 1.5rem 0; }
+
+    /* Standard feed note card */
+    .feed-note {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      overflow: hidden;
+    }
+    .feed-note:hover { border-color: var(--accent); background: var(--surface2); }
+
+    /* Card author row - matches quote card style */
+    .feed-note-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.8rem 1rem 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .feed-note-avatar,
+    .feed-note-avatar-ph {
+      width: 28px; height: 28px; border-radius: 5px;
+      background: var(--surface2); flex-shrink: 0;
+    }
+    .feed-note-avatar { object-fit: cover; }
+    .feed-note-avatar-ph {
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; color: var(--muted);
+    }
+    .feed-note-author-name {
+      font-weight: 500; font-size: 0.85rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      flex: 1; min-width: 0;
+    }
+    .feed-note-author-name .nip05-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; color: var(--accent); margin-left: 0.3rem;
+    }
+    .nip05-badge.nip05-pending { opacity: 0.4; }
+    .nip05-badge.nip05-failed { color: var(--muted); }
+    .feed-note-ts {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem;
+      color: var(--muted); white-space: nowrap; flex-shrink: 0;
+    }
+    .feed-note-body {
+      font-size: 0.9rem; color: #ccc; line-height: 1.6;
+      word-break: break-word; padding: 0.75rem 1rem;
+    }
+    .feed-note-body p { margin: 0 0 0.4rem; }
+    .feed-note-body p:last-child { margin-bottom: 0; }
+    .feed-note-body .inline-img { max-height: 400px; object-fit: contain; width: 100%; border-radius: 6px; background: var(--surface2); }
+
+    /* Reply thread card */
+    .reply-thread {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+      background: var(--surface);
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .reply-thread:hover { border-color: var(--muted2); }
+
+    .reply-parent {
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .reply-parent:hover { background: var(--surface2); }
+
+    .reply-parent-header {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.75rem 1rem 0.5rem;
+    }
+    .reply-parent-avatar,
+    .reply-parent-avatar-ph {
+      width: 24px; height: 24px; border-radius: 4px;
+      background: var(--surface2); flex-shrink: 0;
+    }
+    .reply-parent-avatar { object-fit: cover; }
+    .reply-parent-avatar-ph {
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 0.75rem; color: var(--muted);
+    }
+    .reply-parent-name {
+      font-size: 0.8rem; font-weight: 500; flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: var(--muted);
+    }
+    .reply-parent-ts {
+      font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--muted2); flex-shrink: 0;
+    }
+    .reply-parent-author {
+      display: flex; align-items: center; gap: 0.5rem;
+      cursor: pointer; border-radius: 4px;
+      padding: 0.1rem 0.3rem; margin: -0.1rem -0.3rem;
+      transition: background 0.12s;
+      flex: 1; min-width: 0;
+    }
+    .reply-parent-author:hover { background: var(--surface2); }
+    .reply-parent-author:hover .reply-parent-name { color: var(--accent); }
+    .reply-parent-body {
+      font-size: 0.82rem; color: #777; line-height: 1.5;
+      padding: 0 1rem 0; word-break: break-word;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .reply-parent-body.expanded {
+      -webkit-line-clamp: unset; display: block;
+    }
+    .reply-parent-readmore {
+      display: none;
+      padding: 0.25rem 1rem 0.75rem;
+    }
+    .reply-parent-readmore span {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      cursor: pointer;
+      letter-spacing: 0.05em;
+    }
+    .reply-parent-readmore span:hover { color: var(--accent); }
+    .reply-parent-readmore.visible { display: block; }
+    .reply-parent-footer { padding-bottom: 0.75rem; }
+
+    /* The connector between parent and reply */
+    .reply-connector {
+      display: flex; align-items: center; gap: 0;
+      padding: 0 1rem;
+      position: relative;
+    }
+    .reply-connector-line {
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(to bottom, var(--border), var(--accent));
+      margin-left: 11px;
+      flex-shrink: 0;
+    }
+    .reply-connector-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; color: var(--muted2);
+      letter-spacing: 0.1em; margin-left: 0.8rem;
+    }
+
+    /* The actual reply - highlighted */
+    .reply-self {
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .reply-self:hover { background: rgba(232,255,71,0.04); }
+
+    .reply-self-header {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.75rem 1rem 0.5rem;
+    }
+    .reply-self-avatar,
+    .reply-self-avatar-ph {
+      width: 28px; height: 28px; border-radius: 5px;
+      background: var(--surface2); flex-shrink: 0;
+      border: 1px solid var(--accent);
+    }
+    .reply-self-avatar { object-fit: cover; }
+    .reply-self-avatar-ph {
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; color: var(--accent);
+    }
+    .reply-self-name {
+      font-weight: 500; font-size: 0.85rem; color: var(--accent);
+      flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .reply-self-ts {
+      font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); flex-shrink: 0;
+    }
+    .reply-self-body {
+      font-size: 0.9rem; color: #ddd; line-height: 1.6;
+      padding: 0 1rem 0.85rem; word-break: break-word;
+    }
+    .reply-self-body p { margin: 0 0 0.35rem; }
+    .reply-self-body p:last-child { margin-bottom: 0; }
+
+    /* -- LOAD MORE -- */
+    .feed-load-more {
+      display: flex;
+      justify-content: center;
+      padding: 1rem 0 0.5rem;
+    }
+    .btn-load-more {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-load-more:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-load-more:disabled { opacity: 0.4; cursor: default; }
+    .btn-load-more:disabled:hover { border-color: var(--border); color: var(--muted); }
+
+    /* -- ANIMATIONS -- */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes gatePulse {
+      0%   { stroke-dashoffset: 0; }
+      100% { stroke-dashoffset: -66; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    @keyframes feedCardEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .feed-card-enter { animation: feedCardEnter 0.3s ease-out both; }
+
+    /* -- ABOUT PAGE -- */
+    .about-hero {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 5rem 2rem 0;
+    }
+
+    .about-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.5s 0.1s forwards;
+    }
+
+    .about-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      line-height: 0.92;
+      letter-spacing: 0.02em;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.2s forwards;
+    }
+    .about-title .line-accent { color: var(--accent); }
+    .about-title .line-dim { color: var(--muted2); }
+
+    .about-lead {
+      font-size: 1.1rem;
+      color: #aaa;
+      line-height: 1.75;
+      max-width: 600px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.3s forwards;
+    }
+    .about-lead strong { color: var(--text); font-weight: 500; }
+
+    /* Big divider line */
+    .about-rule {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 0 0 calc(-50vw + 50%);
+      width: 100vw;
+      opacity: 0;
+      animation: fadeUp 0.4s 0.4s forwards;
+    }
+
+    /* What is Nostr section */
+    .about-section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.5s forwards;
+    }
+
+    .about-section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .about-section h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 1.2rem;
+      color: var(--text);
+    }
+
+    .about-section p {
+      font-size: 1rem;
+      color: #888;
+      line-height: 1.8;
+      margin-bottom: 0.8rem;
+    }
+    .about-section p:last-child { margin-bottom: 0; }
+    .about-section strong { color: #bbb; font-weight: 500; }
+    .about-section a { color: var(--accent); text-decoration: none; }
+    .about-section a:hover { text-decoration: underline; }
+
+    /* Principles grid */
+    .about-principles {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem 5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.6s forwards;
+    }
+
+    .about-principles-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 1fr;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .about-cell {
+      background: var(--bg);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-cell::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .about-cell:hover::after { opacity: 1; }
+
+    .about-cell-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      color: var(--muted2);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .about-cell-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .about-cell-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Identifiers section */
+    .about-ids {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 5rem 2rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.7s forwards;
+      transition: padding-bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .about-ids-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .about-ids-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .about-ids h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    .about-ids-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    .about-ids-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+
+    .about-id-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.1rem;
+      transition: border-color 0.15s;
+      cursor: pointer;
+    }
+    .about-id-card:hover { border-color: var(--accent); }
+
+    .about-id-key {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 0.15rem;
+    }
+
+    .about-id-desc {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .about-id-card.active {
+      border-color: var(--accent);
+      border-radius: 6px 6px 0 0;
+    }
+
+    .about-id-drawer {
+      display: none;
+      grid-column: 1 / -1;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      overflow: hidden;
+    }
+    .about-id-drawer.open {
+      display: block;
+      animation: drawerSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes drawerSlide {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .about-id-drawer-inner {
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      gap: 0.6rem;
+      align-items: stretch;
+    }
+
+    .about-id-drawer-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .about-id-drawer input {
+      flex: 1;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-right: none;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      padding: 0.7rem 1rem;
+      border-radius: 4px 0 0 4px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .about-id-drawer input:focus { border-color: var(--accent); }
+    .about-id-drawer input::placeholder { color: var(--muted); }
+
+    .about-id-drawer button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      padding: 0.7rem 1.4rem;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+    .about-id-drawer button:hover { background: #d4eb3a; }
+
+    /* CTA strip */
+    .about-cta {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.8s forwards;
+    }
+
+    .about-cta h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+    .about-cta h2 span { color: var(--accent); }
+
+    .about-cta-btns {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-about-primary {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      padding: 0.75rem 2rem;
+      background: var(--accent);
+      color: #000;
+      border: 2px solid var(--accent);
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+      display: inline-block;
+    }
+    .btn-about-primary:hover { background: transparent; color: var(--accent); }
+
+    .btn-about-secondary {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      padding: 0.75rem 2rem;
+      background: transparent;
+      color: var(--muted);
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-about-secondary:hover { border-color: var(--text); color: var(--text); }
+
+    @media (max-width: 720px) {
+      .about-section { grid-template-columns: 1fr; gap: 2rem; padding: 3rem 1.2rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-ids-grid { grid-template-columns: 1fr 1fr; }
+      .about-cta { flex-direction: column; align-items: flex-start; padding: 3rem 1.2rem; }
+      .about-hero { padding: 3rem 1.2rem 0; }
+      .about-principles { padding: 0 1.2rem 3rem; }
+    }
+    @media (max-width: 480px) {
+      .about-ids-grid { grid-template-columns: 1fr; }
+    }
+
+    /* -- RESPONSIVE -- */
+    @media (max-width: 640px) {
+      .header-search { display: none; }
+      .home-features { grid-template-columns: 1fr; }
+      .entity-wrap { padding: 2rem 1.2rem 5rem; }
+    }
+
+    /* -- LIVE STREAM -- */
+    .live-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+      animation: fadeUp 0.4s forwards;
+    }
+
+    .live-status-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      padding: 0.3rem 0.8rem;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .live-badge.is-live {
+      background: #ff3b3b;
+      color: #fff;
+    }
+    .live-badge.is-ended {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .live-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+    .is-live .live-badge-dot {
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .live-started {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .live-cover {
+      width: 100%;
+      max-height: 420px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      display: block;
+      border: 1px solid var(--border);
+    }
+
+    .live-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      letter-spacing: 0.03em;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .live-summary {
+      font-size: 1rem;
+      color: #999;
+      line-height: 1.7;
+      margin-bottom: 1.8rem;
+      max-width: 640px;
+    }
+
+    .live-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      padding: 1rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .live-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      word-break: break-word;
+      min-width: 0;
+    }
+    .live-meta-item strong { color: #bbb; font-weight: 500; }
+
+    .live-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 2rem;
+    }
+
+    .live-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      letter-spacing: 0.06em;
+    }
+    .hashtag {
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .live-participants {
+      margin-bottom: 2rem;
+    }
+
+    .live-participants-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 0.8rem;
+    }
+
+    .live-participants-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .live-participant {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem 0.3rem 0.3rem;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .live-participant:hover { border-color: var(--accent); }
+    .live-participant img {
+      width: 22px; height: 22px;
+      border-radius: 3px;
+      object-fit: cover;
+    }
+    .live-participant-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: #bbb;
+    }
+    .live-participant-role {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.55rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .live-player-wrap {
+      position: relative;
+      width: 100%;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+    }
+    .live-player-wrap video {
+      width: 100%;
+      display: block;
+      max-height: 520px;
+    }
+    .live-no-stream {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3rem 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .live-no-stream-icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
+    .live-no-stream-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .live-no-stream-text a { color: var(--accent); text-decoration: none; }
+    .live-no-stream-text a:hover { text-decoration: underline; }
+
+    @media (max-width: 640px) {
+      .live-wrap { padding: 2rem 1.2rem 4rem; }
+    }
+
+    /* -- FOOTER -- */
+    footer {
+      position: relative;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 1.4rem 2rem;
+      margin-top: 3rem;
+      overflow: hidden;
+    }
+
+    footer::before {
+      content: 'NOSTRGATE';
+      position: absolute;
+      right: -1rem;
+      bottom: -1.5rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 8rem;
+      color: var(--border);
+      letter-spacing: 0.04em;
+      pointer-events: none;
+      user-select: none;
+      opacity: 0.5;
+      line-height: 1;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-left {}
+
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+    .footer-logo span { color: var(--accent); }
+
+    .footer-tagline {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .footer-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .footer-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .footer-btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+      font-weight: 600;
+    }
+    .footer-btn.primary:hover {
+      background: #d4eb3a;
+      border-color: #d4eb3a;
+      color: #000;
+    }
+
+    .footer-sep {
+      width: 1px;
+      height: 1.2rem;
+      background: var(--border);
+    }
+
+    .footer-credit {
+      width: 100%;
+      padding-top: 1rem;
+      margin-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: #777;
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .footer-credit a { color: #999; text-decoration: none; }
+    .footer-credit a:hover { color: var(--accent); }
+    a.footer-nostr-link { color: #bbb !important; cursor: pointer; }
+    a.footer-nostr-link:hover { color: var(--text) !important; text-decoration: none; }
+
+
+    @media (max-width: 640px) {
+      footer::before { font-size: 4.5rem; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+      .modal-identifiers { grid-template-columns: 1fr; }
+      .modal { border-radius: 8px; }
+    }
+
+    /* -- ZAP MODAL -- */
+    .zap-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: zapFadeIn 0.2s ease forwards;
+    }
+    .zap-overlay.hidden { display: none; }
+    .zap-overlay.fade-out { animation: zapFadeOut 0.15s ease forwards; }
+
+    @keyframes zapFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes zapFadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+    .zap-modal {
+      width: 100%;
+      max-width: 440px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--accent);
+      border-radius: 12px;
+      padding: 1.8rem;
+      position: relative;
+      animation: fadeUp 0.3s ease 0.05s both;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+
+    .zap-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.2rem;
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.15s;
+      line-height: 1;
+    }
+    .zap-close:hover { color: var(--text); }
+
+    .zap-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+
+    .zap-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 0.8rem;
+    }
+
+    .zap-recipient {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .zap-recipient-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--surface2);
+    }
+
+    .zap-amounts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .zap-amt {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.35rem 0.7rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .zap-amt:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .zap-amt.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    .zap-custom-input::-webkit-outer-spin-button,
+    .zap-custom-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .zap-custom-input { -moz-appearance: textfield; }
+
+    .zap-custom-input,
+    .zap-message {
+      width: 100%;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 0.8rem;
+      border-radius: 5px;
+      outline: none;
+      transition: border-color 0.15s;
+      margin-bottom: 0.6rem;
+    }
+    .zap-custom-input::placeholder,
+    .zap-message::placeholder { color: #555; }
+    .zap-custom-input:focus,
+    .zap-message:focus { border-color: var(--accent); }
+
+    .zap-message { resize: none; }
+
+    .zap-msg-footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1rem;
+    }
+    .zap-char-count {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+    .zap-char-count.near-limit { color: var(--accent2); }
+
+    .zap-send {
+      width: 100%;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.1em;
+      background: var(--accent);
+      color: #000;
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .zap-send:hover {
+      background: transparent;
+      color: var(--accent);
+    }
+
+    /* Loading state */
+    .zap-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding: 2rem 0;
+    }
+    .zap-loading-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Invoice step */
+    .zap-step-invoice {
+      animation: fadeUp 0.3s ease both;
+    }
+    .zap-invoice-amount {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--text);
+      text-align: center;
+      width: 100%;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+
+    .zap-qr-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .zap-qr-wrap img {
+      max-width: 240px;
+      width: 100%;
+      background: #fff;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .zap-invoice-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .zap-invoice-actions .client-btn {
+      flex: 1;
+      justify-content: center;
+      font-size: 0.78rem;
+      padding: 0.5rem 0.8rem;
+    }
+
+    .zap-waiting {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    .zap-waiting-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Success state */
+    .zap-success {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 2rem 0;
+      animation: fadeUp 0.3s ease both;
+    }
+    .zap-success-check {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #000;
+      animation: zapScaleIn 0.3s ease both;
+    }
+    @keyframes zapScaleIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .zap-success-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      color: var(--text);
+    }
+
+    /* Error state */
+    .zap-error {
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .zap-error-msg {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent2);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .zap-retry {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      background: none;
+      border: 1px solid var(--accent2);
+      color: var(--accent2);
+      padding: 0.4rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .zap-retry:hover {
+      background: var(--accent2);
+      color: #000;
+    }
+
+    /* Sidebar zap button */
+    .zap-btn {
+      display: block;
+      width: 100%;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.06em;
+      background: var(--accent);
+      color: #000;
+      border: 2px solid var(--accent);
+      border-radius: 5px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .zap-btn:hover {
+      background: transparent;
+      color: var(--accent);
+    }
+
+    /* Small inline zap button (stream status bar) */
+    .zap-btn-sm {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      background: none;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-left: auto;
+    }
+    .zap-btn-sm:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    /* Inline zap section (longform) */
+    .zap-inline-section {
+      display: flex;
+      justify-content: center;
+    }
+    .zap-inline-section .zap-btn {
+      max-width: 280px;
+    }
+
+    /* Profile zap link */
+    .zap-lud16-link {
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .zap-lud16-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .zap-modal {
+        max-width: none;
+        margin: 1rem;
+        border-radius: 10px;
+      }
+      .zap-amounts { flex-wrap: wrap; }
+      .zap-amt { flex: 1 1 calc(33% - 0.4rem); text-align: center; }
+      .zap-invoice-actions { flex-wrap: wrap; }
+      .zap-invoice-actions .client-btn { flex: 1 1 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="accent-stripe"></div>
+
+<header>
+  <div class="logo" id="logo-btn">NOSTR<span>GATE</span></div>
+  <div class="header-search">
+    <input type="text" id="header-input" placeholder="npub1... or nevent1... or note1...">
+    <button class="btn-sm" id="header-btn">OPEN</button>
+  </div>
+</header>
+
+<!-- HOME -->
+<div id="view-home">
+  <div class="home-hero">
+    <div class="home-eyebrow">// Nostr Gateway - The open web. Step through.</div>
+    <h1 class="home-title">
+      VIEW ANY<br>
+      <span class="line2">NOSTR NOTE.</span>
+    </h1>
+    <p class="home-desc">
+      Paste any Nostr identifier - a <strong>profile</strong>, <strong>note</strong>, <strong>article</strong>, or <strong>live stream</strong>,
+      and get a clean preview. Open a gate to any client you prefer.
+    </p>
+    <div class="search-bar">
+      <input type="text" id="home-input" placeholder="npub1... note1... user@domain.com...">
+      <button id="home-btn">OPEN →</button>
+    </div>
+    <div class="home-hints">
+      <span class="hint-chip">user&#64;domain.com - NIP-05</span>
+      <span class="hint-chip">npub1... - profile</span>
+      <span class="hint-chip">note1... - short note</span>
+      <span class="hint-chip">nevent1... - note with relay hints</span>
+      <span class="hint-chip">naddr1... - article, stream, or other content</span>
+      <span class="hint-chip">nprofile1... - profile with relays</span>   
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="view-loading">
+  <div class="loading-wrap">
+    <div class="gate-loader"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></div>
+    <div class="loading-text">OPENING THE GATE...</div>
+  </div>
+</div>
+
+<!-- ERROR -->
+<div id="view-error">
+  <div class="error-wrap">
+    <div class="error-eyebrow">// Lookup failed</div>
+    <h1 class="error-title">
+      NOT<br>
+      <span class="line-accent">FOUND.</span><br>
+      <span class="line-dim">ANYWHERE.</span>
+    </h1>
+    <p class="error-lead">Check what you entered - a mistyped or incomplete identifier is the most likely cause. Nostr identifiers are long and a single missing character will fail silently.</p>
+    <div class="error-msg-detail" id="error-msg">Could not find this Nostr entity.</div>
+    <div class="error-actions">
+      <button class="btn-back" id="error-back">← Try another</button>
+    </div>
+    <div class="error-reasons">
+      <div class="error-reasons-label">// Possible reasons</div>
+      <div class="error-reasons-grid">
+        <div class="error-reason">
+          <div class="error-reason-num">01</div>
+          <div class="error-reason-title">Bad Identifier</div>
+          <div class="error-reason-desc">The most common cause. Double-check it was copied in full - even one missing character will cause a lookup failure.</div>
+        </div>
+        <div class="error-reason">
+          <div class="error-reason-num">02</div>
+          <div class="error-reason-title">Unknown to These Relays</div>
+          <div class="error-reason-desc">The event exists but was only published to relays not in our default list. Try a nevent1 identifier with embedded relay hints.</div>
+        </div>
+        <div class="error-reason">
+          <div class="error-reason-num">03</div>
+          <div class="error-reason-title">Relay Unreachable</div>
+          <div class="error-reason-desc">The least likely cause. The default relays may be temporarily down or rate-limiting. Wait a moment and try again.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="view-about">
+
+  <div class="about-hero">
+    <div class="about-eyebrow">// What is this &amp; why does it exist</div>
+    <h1 class="about-title">
+      OPEN<br>
+      <span class="line-accent">PROTOCOL.</span><br>
+      <span class="line-dim">FREE WEB.</span>
+    </h1>
+    <p class="about-lead">
+      NostrGate <strong>opens Nostr up to anyone</strong> - whether you're already on the network or just curious. No account required. Just content, exactly as it was signed. Step into the open web.
+    </p>
+  </div>
+
+  <hr class="about-rule">
+
+  <div class="about-section">
+    <div>
+      <div class="about-section-label">What is NostrGate?</div>
+      <h2>YOUR BROWSER.<br>THE RELAY.<br>NOTHING ELSE.</h2>
+    </div>
+    <div>
+      <p>Paste any Nostr identifier and NostrGate fetches it directly from public relays - right in your browser. No server processes your request. No middleman stores your query. The data goes from relay to screen.</p>
+      <p>Every note, profile and article you view shows you a client picker - so you can step into whichever Nostr app you prefer with a single click. You pick the client. NostrGate stays out of the way.</p>
+      <p>The entire app is a single HTML file. Self-host it anywhere that serves static files, or just open it locally.</p>
+    </div>
+  </div>
+
+  <div class="about-principles">
+    <div class="about-principles-label">Principles</div>
+    <div class="about-grid">
+      <div class="about-cell">
+        <div class="about-cell-num">01</div>
+        <div class="about-cell-title">Share</div>
+        <div class="about-cell-desc">Built to be the gate. Paste any Nostr link and get a clean, shareable preview anyone can read - no app or account needed. Share Nostr content anywhere on the web.</div>
+      </div>
+      <div class="about-cell">
+        <div class="about-cell-num">02</div>
+        <div class="about-cell-title">Send Value</div>
+        <div class="about-cell-desc">Not just a gate for content - a gate for value. Anyone can send lightning zaps to creators directly through NostrGate, no Nostr account required. Value for value, open to everyone.</div>
+      </div>
+      <div class="about-cell">
+        <div class="about-cell-num">03</div>
+        <div class="about-cell-title">No Server</div>
+        <div class="about-cell-desc">Everything runs in your browser. Relay connections are WebSocket, opened client-side. Nothing is logged, cached server-side, or tracked.</div>
+      </div>
+      <div class="about-cell">
+        <div class="about-cell-num">04</div>
+        <div class="about-cell-title">No Lock-In</div>
+        <div class="about-cell-desc">Every page links to Primal, Snort, Iris, Coracle, Nostrudel and more. You choose your client. NostrGate has no preference.</div>
+      </div>
+      <div class="about-cell">
+        <div class="about-cell-num">05</div>
+        <div class="about-cell-title">No Account</div>
+        <div class="about-cell-desc">No keys required. Anyone with a link can view a Nostr profile or note - and even send zaps - without ever touching a client app.</div>
+      </div>
+      <div class="about-cell">
+        <div class="about-cell-num">06</div>
+        <div class="about-cell-title">Open Source</div>
+        <div class="about-cell-desc">One HTML file, MIT licensed. Simple to self-host. index.html is the whole app - inspect it in DevTools right now.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-ids">
+    <div class="about-ids-inner">
+      <div class="about-ids-header">
+        <h2>SUPPORTED<br>IDENTIFIERS</h2>
+        <div class="about-ids-sub">// Click any to search</div>
+      </div>
+      <div class="about-ids-grid" id="about-ids-grid">
+        <div class="about-id-card" data-label="Find by npub" data-placeholder="npub1… paste a public key">
+          <div class="about-id-key">npub1…</div>
+          <div class="about-id-desc">Public key - view a user's profile, bio, and recent notes</div>
+        </div>
+        <div class="about-id-card" data-label="Find by nprofile" data-placeholder="nprofile1… paste a profile with relay hints">
+          <div class="about-id-key">nprofile1…</div>
+          <div class="about-id-desc">Profile with relay hints - finds the user faster</div>
+        </div>
+        <div class="about-id-card" data-label="Find by note" data-placeholder="note1… paste a short note ID">
+          <div class="about-id-key">note1…</div>
+          <div class="about-id-desc">Short note - a single post, with media and quote support</div>
+        </div>
+        <div class="about-id-card" data-label="Find by nevent" data-placeholder="nevent1… paste a note with relay hints">
+          <div class="about-id-key">nevent1…</div>
+          <div class="about-id-desc">Note with relay hints - more reliable for obscure events</div>
+        </div>
+        <div class="about-id-card" data-label="Find by naddr" data-placeholder="naddr1… paste an article or stream address">
+          <div class="about-id-key">naddr1…</div>
+          <div class="about-id-desc">Long-form article or live stream - rendered with full formatting</div>
+        </div>
+        <div class="about-id-card" data-label="Find by NIP-05" data-placeholder="user@domain.com or domain.com">
+          <div class="about-id-key">user&#64;domain.com</div>
+          <div class="about-id-desc">NIP-05 address - looks up the corresponding public key</div>
+        </div>
+        <!-- Slide-down drawer - spans full width, shown below active card row -->
+        <div class="about-id-drawer" id="about-id-drawer">
+          <div class="about-id-drawer-inner">
+            <div style="flex:1">
+              <div class="about-id-drawer-label" id="about-drawer-label">Find by npub</div>
+              <div style="display:flex">
+                <input type="text" id="about-drawer-input" placeholder="npub1…">
+                <button id="about-drawer-btn">OPEN →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-cta">
+    <h2>READY TO<br><span>EXPLORE?</span></h2>
+    <div class="about-cta-btns">
+      <button class="btn-about-primary" id="about-try-btn">Try it now →</button>
+      <a class="btn-about-secondary" href="https://github.com" target="_blank" rel="noopener" id="about-github-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        View Source
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ENTITY -->
+<div id="view-entity">
+  <div class="entity-wrap" id="entity-content"></div>
+</div>
+
+<script type="module">
+import { nip19, finalizeEvent, generateSecretKey, getPublicKey } from 'https://esm.sh/nostr-tools@2.10.4';
+import { SimplePool } from 'https://esm.sh/nostr-tools@2.10.4/pool';
+import Hls from 'https://esm.sh/hls.js@1.5.15';
+import QRCode from 'https://esm.sh/qrcode@1.5.4/lib/browser';
+import { marked } from 'https://esm.sh/marked@14.0.0';
+
+const pool = new SimplePool();
+
+const NOSTRGATE_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwYTBhMGEiIHJ4PSI1Ii8+CiAgPHBvbHlnb24gcG9pbnRzPSIxNiwyIDI4LDkgMjgsMjMgMTYsMzAgNCwyMyA0LDkiIGZpbGw9IiNlOGZmNDciLz4KICA8cG9seWdvbiBwb2ludHM9IjE5LDUgMTEsMTggMTYsMTggMTMsMjcgMjEsMTQgMTYsMTQiIGZpbGw9IiMwYTBhMGEiLz4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxLjgiIGZpbGw9IiNlOGZmNDciLz4KPC9zdmc+';
+
+// -- IndexedDB persistence --
+let db = null;
+
+function openDB() {
+  return new Promise(resolve => {
+    try {
+      const req = indexedDB.open('nostrgate', 1);
+      req.onupgradeneeded = e => {
+        const d = e.target.result;
+        if (!d.objectStoreNames.contains('events')) d.createObjectStore('events', { keyPath: 'id' });
+        if (!d.objectStoreNames.contains('profiles')) d.createObjectStore('profiles');
+        if (!d.objectStoreNames.contains('addrEvents')) d.createObjectStore('addrEvents');
+        if (!d.objectStoreNames.contains('feedState')) d.createObjectStore('feedState');
+        if (!d.objectStoreNames.contains('nip05')) d.createObjectStore('nip05');
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch { resolve(null); }
+  });
+}
+
+function dbPut(store, value, key) {
+  if (!db) return;
+  try {
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).put(value, key);
+  } catch {}
+}
+
+function dbLoadAll(store) {
+  if (!db) return Promise.resolve({ keys: [], values: [] });
+  return new Promise(resolve => {
+    try {
+      const tx = db.transaction(store, 'readonly');
+      const s = tx.objectStore(store);
+      const kReq = s.getAllKeys();
+      const vReq = s.getAll();
+      let keys, values;
+      kReq.onsuccess = () => { keys = kReq.result; if (values !== undefined) resolve({ keys, values }); };
+      vReq.onsuccess = () => { values = vReq.result; if (keys !== undefined) resolve({ keys, values }); };
+      tx.onerror = () => resolve({ keys: [], values: [] });
+    } catch { resolve({ keys: [], values: [] }); }
+  });
+}
+
+async function loadCacheFromDB() {
+  if (!db) return;
+
+  const { values: events } = await dbLoadAll('events');
+  events.forEach(e => cache.events.set(e.id, e));
+
+  const { keys: pKeys, values: pVals } = await dbLoadAll('profiles');
+  pKeys.forEach((k, i) => cache.profiles.set(k, pVals[i]));
+
+  const { keys: aKeys, values: aVals } = await dbLoadAll('addrEvents');
+  aKeys.forEach((k, i) => cache.addrEvents.set(k, aVals[i]));
+
+  const { keys: nKeys, values: nVals } = await dbLoadAll('nip05');
+  nKeys.forEach((k, i) => cache.nip05.set(k, nVals[i]));
+}
+
+// -- Write-through cache helpers --
+function cacheEvent(e) {
+  cache.events.set(e.id, e);
+  dbPut('events', e);
+}
+
+function cacheProfile(pubkey, meta) {
+  cache.profiles.set(pubkey, meta);
+  dbPut('profiles', meta, pubkey);
+}
+
+function cacheNip05(key, value) {
+  cache.nip05.set(key, value);
+  if (value !== null) dbPut('nip05', value, key);
+}
+
+function cacheAddrEvent(cacheKey, e) {
+  cache.addrEvents.set(cacheKey, e);
+  dbPut('addrEvents', e, cacheKey);
+}
+
+function cacheFeedState(pubkey, state) {
+  cache.feedState.set(pubkey, state);
+}
+
+// -- Session cache - avoids re-fetching data already loaded this session --
+const cache = {
+  profiles:     new Map(),  // pubkey        → metadata object (or null)
+  events:       new Map(),  // event id      → event object
+  addrEvents:   new Map(),  // "kind:pubkey:d" → event object
+  profileNotes: new Map(),  // pubkey        → event[]
+  profileReplies: new Map(),// pubkey        → event[]
+  nip05:        new Map(),  // "nip05:pubkey" → true/false (null = in-progress)
+  feedState:    new Map(),  // pubkey → { notesHTML, repliesHTML, activeTab, notes, notesUntil, ... }
+};
+
+const DEFAULT_RELAYS = [
+  'wss://relay.damus.io',
+  'wss://relay.nostr.band',
+  'wss://nos.lol',
+  'wss://nostr.wine',
+  'wss://relay.primal.net',
+];
+
+const IMAGE_EXTS = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i;
+const VIDEO_EXTS = /\.(mp4|webm|ogg|mov)(\?.*)?$/i;
+const AUDIO_EXTS = /\.(mp3|wav|ogg|flac|aac)(\?.*)?$/i;
+const YOUTUBE_RE = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+
+const CLIENTS = {
+  // Shown by default in the main row
+  // URL patterns verified against live client source code (Feb 2026)
+  web: [
+    // Primal: /p/{npub|nprofile}, /e/{note1|nevent}, /a/{naddr}
+    { name: 'Primal',    url: e => {
+        if (e.type === 'npub' || e.type === 'nprofile') return `https://primal.net/p/${e.raw}`;
+        if (e.type === 'naddr') return `https://primal.net/a/${e.raw}`;
+        return `https://primal.net/e/${e.raw}`;
+      }
+    },
+    // Snort: accepts bare npub/nevent/naddr directly at root
+    { name: 'Snort',     url: e => `https://snort.social/${e.raw}` },
+    // Iris: accepts bare npub/nevent/naddr directly at root
+    { name: 'Iris',      url: e => `https://iris.to/${e.raw}` },
+    // Coracle: accepts bare npub/nevent/naddr via catch-all /:entity route
+    { name: 'Coracle',   url: e => `https://coracle.social/${e.raw}` },
+    // Nostrudel: /u/{npub|nprofile}, /n/{note1|nevent}, /l/{naddr} (generic link handler)
+    { name: 'Nostrudel', url: e => {
+        if (e.type === 'npub' || e.type === 'nprofile') return `https://nostrudel.ninja/u/${e.raw}`;
+        if (e.type === 'note' || e.type === 'nevent') return `https://nostrudel.ninja/n/${e.raw}`;
+        return `https://nostrudel.ninja/l/${e.raw}`;
+      }
+    },
+  ],
+  // Hidden behind "More" - per-client correct URL patterns
+  extra: [
+    // Habla: /a/{naddr}, /p/{npub|nprofile}, /e/{nevent}
+    { name: 'Habla',      url: e => {
+        if (e.type === 'naddr') return `https://habla.news/a/${e.raw}`;
+        if (e.type === 'npub' || e.type === 'nprofile') return `https://habla.news/p/${e.raw}`;
+        return `https://habla.news/e/${e.raw}`;
+      }
+    },
+    // YakiHonne: /profile/{npub|nprofile}, /note/{nevent}, /article/{naddr}
+    { name: 'YakiHonne',  url: e => {
+        if (e.type === 'npub' || e.type === 'nprofile') return `https://yakihonne.com/profile/${e.raw}`;
+        if (e.type === 'naddr') return `https://yakihonne.com/article/${e.raw}`;
+        return `https://yakihonne.com/note/${e.raw}`;
+      }
+    },
+    // Satellite: /@{npub|nprofile} for profiles, /thread/{note|nevent} for notes
+    { name: 'Satellite',  url: e => {
+        if (e.type === 'npub' || e.type === 'nprofile') return `https://satellite.earth/@${e.raw}`;
+        if (e.type === 'note' || e.type === 'nevent') return `https://satellite.earth/thread/${e.raw}`;
+        return `https://satellite.earth/@${e.raw}`;
+      }, hideFor: ['longform']
+    },
+    // Highlighter: /{npub|nprofile} for profiles, /a/{nevent|naddr} for content
+    { name: 'Highlighter',url: e => {
+        if (e.type === 'npub' || e.type === 'nprofile') return `https://highlighter.com/${e.raw}`;
+        return `https://highlighter.com/a/${e.raw}`;
+      }
+    },
+    // Nosta: profile/note tool, hide for longform articles and live streams
+    { name: 'Nosta',      url: e => `https://nosta.me/${e.raw}`, hideFor: ['longform', 'live'] },
+  ],
+  // Live stream clients
+  live: [
+    { name: 'Zap.stream', url: e => `https://zap.stream/${e.raw}` },
+  ],
+  native: [
+    { name: 'Open in App', url: e => `nostr:${e.raw}`, primary: true },
+  ],
+};
+
+// -- Routing --
+function getEntityFromURL() {
+  const hash = location.hash.slice(1);
+  if (hash === 'about') return '';   // reserved for the about page
+  const search = new URLSearchParams(location.search);
+  return hash || search.get('e') || search.get('entity') || '';
+}
+
+function isAboutURL() {
+  return location.hash === '#about';
+}
+
+function setEntityInURL(raw) { history.pushState({}, '', `#${raw}`); }
+
+function showView(name) {
+  ['home','loading','error','entity','about'].forEach(v =>
+    document.getElementById(`view-${v}`).classList.remove('active'));
+  document.getElementById(`view-${name}`).classList.add('active');
+}
+
+function goHome() {
+  document.title = 'NostrGate - A window into the open web';
+  history.pushState({}, '', location.pathname);
+  window.scrollTo({top:0,behavior:'instant'});
+  showView('home');
+  // Restore default entity view structure in case note-layout replaced it
+  document.getElementById('view-entity').innerHTML = '<div class="entity-wrap" id="entity-content"></div>';
+}
+
+function navigate(raw) { raw = raw.trim().replace(/^nostr:/i, ''); setEntityInURL(raw); window.scrollTo({top:0,behavior:'instant'}); loadEntity(raw); }
+
+// -- NIP-19 decode --
+function normaliseNip05(raw) {
+  // Strip leading # (from URL hash), leading _ and/or @
+  let s = raw.trim().replace(/^#/, '');
+  // domain.com only (no @ at all) → _@domain.com
+  if (!s.includes('@')) return `_@${s}`;
+  // @domain.com → _@domain.com
+  if (s.startsWith('@')) return `_${s}`;
+  // _@domain.com already canonical
+  return s;
+}
+
+function looksLikeNip05(raw) {
+  const s = raw.trim().replace(/^#/, '');
+  // user@domain.com  |  @domain.com  |  domain.com (no spaces, has a dot)
+  return /^_?@?[a-z0-9_\-\.]+\.[a-z]{2,}$/i.test(s) ||
+         /^[a-z0-9_\.\-\+]+@[a-z0-9_\-\.]+\.[a-z]{2,}$/i.test(s);
+}
+
+function decodeEntity(raw) {
+  try {
+    const decoded = nip19.decode(raw);
+    const id = typeof decoded.data === 'string' ? decoded.data : decoded.data?.id || decoded.data?.pubkey;
+    return { raw, type: decoded.type, data: decoded.data, id };
+  } catch {
+    if (/^[0-9a-f]{64}$/i.test(raw)) return { raw, type: 'hex', data: raw, id: raw };
+    if (looksLikeNip05(raw)) return { raw, type: 'nip05', data: normaliseNip05(raw), id: null };
+    return null;
+  }
+}
+
+// -- NIP-05 lookup --
+async function fetchNip05Pubkey(identifier) {
+  // identifier is canonical form: name@domain  or  _@domain
+  const [name, domain] = identifier.split('@');
+  const url = `https://${domain}/.well-known/nostr.json?name=${encodeURIComponent(name)}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json?.names?.[name] || null;
+  } catch {
+    return null;
+  }
+}
+
+async function verifyNip05(nip05Raw, pubkey) {
+  const nip05 = normaliseNip05(nip05Raw);
+  const key = `${nip05}:${pubkey}`;
+  if (cache.nip05.has(key)) return cache.nip05.get(key);
+  cacheNip05(key, null); // mark in-progress
+  const resolved = await fetchNip05Pubkey(nip05);
+  const verified = resolved === pubkey;
+  cacheNip05(key, verified);
+  return verified;
+}
+
+function applyNip05State(el, verified) {
+  el.classList.remove('nip05-pending');
+  el.classList.add(verified ? 'nip05-verified' : 'nip05-failed');
+  if (!verified) {
+    const check = el.querySelector('.nip05-check');
+    if (check) check.textContent = '\u2717';
+  }
+}
+
+async function verifyNip05Badges(container) {
+  const els = container.querySelectorAll('.nip05-pending[data-nip05-pubkey]');
+  const groups = new Map();
+  els.forEach(el => {
+    const pk = el.dataset.nip05Pubkey;
+    if (!groups.has(pk)) groups.set(pk, []);
+    groups.get(pk).push(el);
+  });
+  for (const [pk, elems] of groups) {
+    const nip05Raw = elems[0].dataset.nip05;
+    const key = `${normaliseNip05(nip05Raw)}:${pk}`;
+    const cached = cache.nip05.get(key);
+    if (cached === true || cached === false) {
+      elems.forEach(el => applyNip05State(el, cached));
+      continue;
+    }
+    verifyNip05(nip05Raw, pk).then(verified => {
+      elems.forEach(el => applyNip05State(el, verified));
+    });
+  }
+}
+
+// -- Load entity --
+async function loadEntity(raw) {
+  showView('loading');
+  const entity = decodeEntity(raw.trim().replace(/^nostr:/i, ''));
+  if (!entity) { showError('Invalid Nostr identifier. Please check and try again.'); return; }
+  try {
+    // NIP-05 address - resolve to pubkey first
+    if (entity.type === 'nip05') {
+      const pubkey = await fetchNip05Pubkey(entity.data);
+      if (!pubkey) { showError(`Could not resolve NIP-05 address: ${entity.data}`); return; }
+      const npub = nip19.npubEncode(pubkey);
+      const profile = await fetchProfile(pubkey, DEFAULT_RELAYS);
+      renderProfile({ raw: npub, type: 'npub', data: pubkey, id: pubkey }, pubkey, profile);
+      return;
+    }
+    if (entity.type === 'npub' || entity.type === 'nprofile') {
+      const pubkey = entity.type === 'npub' ? entity.data : entity.data.pubkey;
+      const relays = entity.type === 'nprofile' && entity.data.relays?.length ? entity.data.relays : DEFAULT_RELAYS;
+      const profile = await fetchProfile(pubkey, relays);
+      renderProfile(entity, pubkey, profile);
+    } else if (entity.type === 'note' || entity.type === 'nevent') {
+      const id = entity.type === 'note' ? entity.data : entity.data.id;
+      const relays = entity.type === 'nevent' && entity.data.relays?.length ? entity.data.relays : DEFAULT_RELAYS;
+      const event = await fetchEvent(id, relays);
+      if (!event) { showError('Note not found on any relay.'); return; }
+      const author = await fetchProfile(event.pubkey, DEFAULT_RELAYS);
+      renderNote(entity, event, author);
+    } else if (entity.type === 'naddr') {
+      const { pubkey, kind, identifier, relays } = entity.data;
+      const useRelays = relays?.length ? relays : DEFAULT_RELAYS;
+      const event = await fetchAddrEvent(pubkey, kind, identifier, useRelays);
+      if (!event) { showError('Event not found on any relay.'); return; }
+      const author = await fetchProfile(pubkey, DEFAULT_RELAYS);
+      if (kind === 30311) renderLiveStream(entity, event, author);
+      else renderLongform(entity, event, author);
+    } else {
+      showError('Unsupported entity type: ' + entity.type);
+    }
+  } catch(err) {
+    showError('Failed to fetch from relays. They may be unreachable.');
+  }
+}
+
+// -- Relay fetchers --
+function fetchProfile(pubkey, relays) {
+  if (cache.profiles.has(pubkey)) {
+    // Return cached immediately, revalidate in background
+    const stale = cache.profiles.get(pubkey);
+    pool.subscribeMany(relays, [{ kinds:[0], authors:[pubkey], limit:1 }], {
+      onevent(e) {
+        try { const m = JSON.parse(e.content); cacheProfile(pubkey, m); } catch {}
+      },
+      oneose() {}
+    });
+    return Promise.resolve(stale);
+  }
+  return new Promise(resolve => {
+    let done = false;
+    const t = setTimeout(() => { if (!done) { done = true; cacheProfile(pubkey, null); resolve(null); } }, 6000);
+    pool.subscribeMany(relays, [{ kinds:[0], authors:[pubkey], limit:1 }], {
+      onevent(e) {
+        if (done) return; done=true; clearTimeout(t);
+        try { const m = JSON.parse(e.content); cacheProfile(pubkey, m); resolve(m); }
+        catch { cacheProfile(pubkey, null); resolve(null); }
+      },
+      oneose() { if (!done) { done=true; clearTimeout(t); cacheProfile(pubkey, null); resolve(null); } }
+    });
+  });
+}
+
+function fetchEvent(id, relays) {
+  if (cache.events.has(id)) return Promise.resolve(cache.events.get(id));
+  return new Promise(resolve => {
+    let done = false;
+    const t = setTimeout(() => { if (!done) { done=true; resolve(null); } }, 6000);
+    pool.subscribeMany(relays, [{ ids:[id], limit:1 }], {
+      onevent(e) { if (done) return; done=true; clearTimeout(t); cacheEvent(e); resolve(e); },
+      oneose()   { if (!done) { done=true; clearTimeout(t); resolve(null); } }
+    });
+  });
+}
+
+function fetchAddrEvent(pubkey, kind, identifier, relays) {
+  const cacheKey = `${kind}:${pubkey}:${identifier}`;
+  if (cache.addrEvents.has(cacheKey)) {
+    // Return cached immediately, revalidate in background
+    const stale = cache.addrEvents.get(cacheKey);
+    pool.subscribeMany(relays, [{ kinds:[kind], authors:[pubkey], '#d':[identifier], limit:1 }], {
+      onevent(e) { cacheAddrEvent(cacheKey, e); },
+      oneose() {}
+    });
+    return Promise.resolve(stale);
+  }
+  return new Promise(resolve => {
+    let done = false;
+    const t = setTimeout(() => { if (!done) { done=true; resolve(null); } }, 8000);
+    pool.subscribeMany(relays, [{ kinds:[kind], authors:[pubkey], '#d':[identifier], limit:1 }], {
+      onevent(e) { if (done) return; done=true; clearTimeout(t); cacheAddrEvent(cacheKey, e); resolve(e); },
+      oneose()   { if (!done) { done=true; clearTimeout(t); resolve(null); } }
+    });
+  });
+}
+
+function fetchProfileNotes(pubkey, relays, limit=20) {
+  if (cache.profileNotes.has(pubkey)) return Promise.resolve(cache.profileNotes.get(pubkey));
+  return new Promise(resolve => {
+    const events = [];
+    const t = setTimeout(() => { cache.profileNotes.set(pubkey, events); resolve(events); }, 8000);
+    pool.subscribeMany(relays, [{ kinds:[1], authors:[pubkey], limit }], {
+      onevent(e) { events.push(e); cacheEvent(e); },
+      oneose()   { clearTimeout(t); cache.profileNotes.set(pubkey, events); resolve(events); }
+    });
+  });
+}
+
+function fetchProfileReplies(pubkey, relays, limit=20) {
+  if (cache.profileReplies.has(pubkey)) return Promise.resolve(cache.profileReplies.get(pubkey));
+  return new Promise(resolve => {
+    const events = [];
+    const t = setTimeout(() => { cache.profileReplies.set(pubkey, events); resolve(events); }, 8000);
+    pool.subscribeMany(relays, [{ kinds:[1], authors:[pubkey], limit: limit * 2 }], {
+      onevent(e) {
+        if (e.tags.some(t => t[0] === 'e')) { events.push(e); cacheEvent(e); }
+      },
+      oneose() {
+        clearTimeout(t);
+        const result = events.slice(0, limit);
+        cache.profileReplies.set(pubkey, result);
+        resolve(result);
+      }
+    });
+  });
+}
+
+function fetchEventsByIds(ids, relays) {
+  if (!ids.length) return Promise.resolve([]);
+  const cached = ids.map(id => cache.events.get(id)).filter(Boolean);
+  const missing = ids.filter(id => !cache.events.has(id));
+  if (!missing.length) return Promise.resolve(cached);
+  return new Promise(resolve => {
+    const events = [...cached];
+    const t = setTimeout(() => resolve(events), 5000);
+    pool.subscribeMany(relays, [{ ids: missing, limit: missing.length }], {
+      onevent(e) { cacheEvent(e); events.push(e); },
+      oneose()   { clearTimeout(t); resolve(events); }
+    });
+  });
+}
+
+function fetchProfilesByPubkeys(pubkeys, relays) {
+  if (!pubkeys.length) return Promise.resolve({});
+  const result = {};
+  const missing = [];
+  for (const pk of pubkeys) {
+    if (cache.profiles.has(pk)) { result[pk] = cache.profiles.get(pk); }
+    else { missing.push(pk); }
+  }
+  if (!missing.length) return Promise.resolve(result);
+  return new Promise(resolve => {
+    const t = setTimeout(() => resolve(result), 5000);
+    pool.subscribeMany(relays, [{ kinds:[0], authors: missing, limit: missing.length }], {
+      onevent(e) {
+        try { const m = JSON.parse(e.content); cacheProfile(e.pubkey, m); result[e.pubkey] = m; }
+        catch { cacheProfile(e.pubkey, null); }
+      },
+      oneose() { clearTimeout(t); resolve(result); }
+    });
+  });
+}
+
+// -- Extract all mentioned pubkeys from events (p tags + content nostr: references) --
+function extractMentionedPubkeys(events) {
+  const pubkeys = new Set();
+  for (const event of events) {
+    // From p tags
+    for (const tag of event.tags) {
+      if (tag[0] === 'p' && tag[1]) pubkeys.add(tag[1]);
+    }
+    // From content nostr:npub1... and nostr:nprofile1... references
+    const matches = event.content.matchAll(/nostr:(npub1[a-z0-9]+|nprofile1[a-z0-9]+)/g);
+    for (const m of matches) {
+      try {
+        const decoded = nip19.decode(m[1]);
+        const pk = decoded.type === 'npub' ? decoded.data : decoded.data?.pubkey;
+        if (pk) pubkeys.add(pk);
+      } catch {}
+    }
+  }
+  return [...pubkeys];
+}
+
+// -- Rich content renderer --
+// Converts note text into HTML with inline media, embeds, and nostr references
+function renderContent(text, mentionProfiles = {}) {
+  // Split on whitespace-bounded URLs and nostr: references so we can process token by token
+  const tokens = text.split(/(\s+)/);
+  let html = '';
+
+  for (const token of tokens) {
+    const trimmed = token.trim();
+
+    // nostr: references — strip trailing punctuation (bech32 is only [a-z0-9])
+    if (trimmed.startsWith('nostr:')) {
+      const raw = trimmed.slice(6);
+      const bm = raw.match(/^([a-z0-9]+)(.*)/);
+      if (!bm) { html += esc(token); continue; }
+      const ref = bm[1], trailing = bm[2];
+      try {
+        const decoded = nip19.decode(ref);
+        if (decoded.type === 'npub' || decoded.type === 'nprofile') {
+          const pubkey = decoded.type === 'npub' ? decoded.data : decoded.data.pubkey;
+          const meta = mentionProfiles[pubkey];
+          const name = displayName(meta, pubkey);
+          html += `<a class="nostr-mention" href="#${esc(ref)}" data-entity="${esc(ref)}">@${esc(name)}</a>${esc(trailing)}`;
+          continue;
+        } else if (decoded.type === 'note' || decoded.type === 'nevent' || decoded.type === 'naddr') {
+          html += `<div class="quote-ref" data-entity="${esc(ref)}">
+            <div class="quote-loading">
+              <span class="quote-spinner"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span> Loading quoted note…
+            </div>
+          </div>${esc(trailing)}`;
+          continue;
+        }
+      } catch {}
+      // fallback - just link it
+      html += `<a class="nostr-mention" href="#${esc(ref)}" data-entity="${esc(ref)}">${esc('nostr:' + ref)}</a>${esc(trailing)}`;
+      continue;
+    }
+
+    // Regular URLs
+    if (/^https?:\/\//i.test(trimmed)) {
+      // Image
+      if (IMAGE_EXTS.test(trimmed)) {
+        html += `<div class="media-block"><img class="inline-img" src="${esc(trimmed)}" alt="image" loading="lazy" onerror="this.parentElement.remove()"></div>`;
+        continue;
+      }
+      // Video
+      if (VIDEO_EXTS.test(trimmed)) {
+        html += `<div class="media-block"><video class="inline-video" controls preload="metadata" src="${esc(trimmed)}" onerror="this.parentElement.remove()"></video></div>`;
+        continue;
+      }
+      // Audio
+      if (AUDIO_EXTS.test(trimmed)) {
+        html += `<div class="media-block"><audio class="inline-audio" controls src="${esc(trimmed)}" onerror="this.parentElement.remove()"></audio></div>`;
+        continue;
+      }
+      // YouTube
+      const ytMatch = trimmed.match(YOUTUBE_RE);
+      if (ytMatch) {
+        html += `<div class="media-block media-embed"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>`;
+        continue;
+      }
+      // Regular link
+      html += `<a class="inline-link" href="${esc(trimmed)}" target="_blank" rel="noopener">${esc(trimmed)}</a>`;
+      continue;
+    }
+
+    // Hashtags
+    if (/^#[a-zA-Z]\w{0,49}$/.test(trimmed)) {
+      html += `<span class="hashtag">${esc(token)}</span>`;
+      continue;
+    }
+
+    // Plain text (preserve whitespace tokens as-is)
+    html += esc(token);
+  }
+
+  // Wrap in paragraphs on double newlines
+  html = html.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if (!p) return '';
+    if (p.startsWith('<div class="media-block') || p.startsWith('<div class="quote-ref')) return p;
+    return `<p>${p.replace(/\n/g, '<br>')}</p>`;
+  }).filter(Boolean).join('\n');
+
+  return html;
+}
+
+// -- Lightweight preview renderer for quote card text --
+function renderQuotePreview(text, profiles = {}) {
+  // Strip nostr:note/nevent/naddr references (don't nest quotes)
+  let cleaned = text.replace(/nostr:(note1|nevent1|naddr1)[a-z0-9]+/g, '');
+  // Truncate
+  if (cleaned.length > 280) cleaned = cleaned.slice(0, 280) + '…';
+  // Escape first
+  let html = esc(cleaned);
+  // Linkify URLs
+  html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a class="inline-link" href="$1" target="_blank" rel="noopener">$1</a>');
+  // Resolve nostr:npub/nprofile mentions
+  html = html.replace(/nostr:(npub1[a-z0-9]+|nprofile1[a-z0-9]+)/g, (match, ref) => {
+    try {
+      const decoded = nip19.decode(ref);
+      const pk = decoded.type === 'npub' ? decoded.data : decoded.data?.pubkey;
+      const meta = profiles[pk];
+      const name = displayName(meta, pk);
+      return `<a class="nostr-mention" href="#${esc(ref)}" data-entity="${esc(ref)}">@${esc(name)}</a>`;
+    } catch { return match; }
+  });
+  html = html.replace(/(^|\s)(#[a-zA-Z]\w{0,49})(?=[\s,.:;!?]|$)/g, '$1<span class="hashtag">$2</span>');
+  return html;
+}
+
+// -- Resolve quote cards after DOM insertion --
+async function resolveQuotes(container) {
+  const quoteEls = container.querySelectorAll('.quote-ref[data-entity]');
+  if (!quoteEls.length) return;
+
+  const ids = [];
+  const addrRefs = []; // {el, decoded} for naddr entities
+  quoteEls.forEach(el => {
+    try {
+      const decoded = nip19.decode(el.dataset.entity);
+      if (decoded.type === 'naddr') {
+        addrRefs.push({ el, decoded });
+      } else {
+        const id = decoded.type === 'note' ? decoded.data : decoded.data?.id;
+        if (id) ids.push(id);
+      }
+    } catch {}
+  });
+
+  // Fetch note/nevent events
+  const events = await fetchEventsByIds(ids, DEFAULT_RELAYS);
+
+  // Fetch naddr events
+  const addrEvents = [];
+  for (const { decoded } of addrRefs) {
+    const d = decoded.data;
+    const event = await fetchAddrEvent(d.pubkey, d.kind, d.identifier, d.relays?.length ? d.relays : DEFAULT_RELAYS);
+    if (event) addrEvents.push(event);
+  }
+
+  const allEvents = [...events, ...addrEvents];
+  const pubkeys = [...new Set(allEvents.map(e => e.pubkey))];
+  // Also collect mentioned pubkeys from quote content for preview rendering
+  const mentionPubkeys = extractMentionedPubkeys(allEvents);
+  const allPubkeys = [...new Set([...pubkeys, ...mentionPubkeys])];
+  const profiles = await fetchProfilesByPubkeys(allPubkeys, DEFAULT_RELAYS);
+
+  // Render note/nevent quote cards
+  quoteEls.forEach(el => {
+    try {
+      const decoded = nip19.decode(el.dataset.entity);
+      if (decoded.type === 'naddr') return; // handled separately below
+      const id = decoded.type === 'note' ? decoded.data : decoded.data?.id;
+      const event = events.find(e => e.id === id);
+      if (!event) { el.innerHTML = `<div class="quote-missing">Quoted note not found</div>`; return; }
+      const meta = profiles[event.pubkey];
+      const name = displayName(meta, event.pubkey);
+      const avatar = meta?.picture || '';
+      const ts = new Date(event.created_at * 1000);
+      const raw = nip19.noteEncode(event.id);
+      el.innerHTML = `
+        <div class="quote-card" data-entity="${esc(raw)}">
+          <div class="quote-author">
+            ${avatar ? `<img class="quote-avatar" src="${esc(avatar)}" onerror="this.style.display='none'">` : ''}
+            <span class="quote-name">${esc(name)}</span>
+            <span class="quote-time">${formatDate(ts)}</span>
+          </div>
+          <div class="quote-text">${renderQuotePreview(event.content, profiles)}</div>
+        </div>`;
+      el.querySelector('.quote-card').addEventListener('click', () => navigate(raw));
+    } catch {}
+  });
+
+  // Render naddr quote cards
+  for (const { el, decoded } of addrRefs) {
+    try {
+      const d = decoded.data;
+      const event = addrEvents.find(e => e.pubkey === d.pubkey && e.kind === d.kind && e.tags.some(t => t[0] === 'd' && t[1] === d.identifier));
+      if (!event) { el.innerHTML = `<div class="quote-missing">Quoted content not found</div>`; continue; }
+      const meta = profiles[event.pubkey];
+      const name = displayName(meta, event.pubkey);
+      const avatar = meta?.picture || '';
+      const ts = new Date(event.created_at * 1000);
+      const entityRef = el.dataset.entity;
+      // For articles (kind 30023), show title if available
+      const title = event.tags.find(t => t[0] === 'title')?.[1];
+      const previewText = title ? esc(title) : renderQuotePreview(event.content, profiles);
+      el.innerHTML = `
+        <div class="quote-card" data-entity="${esc(entityRef)}">
+          <div class="quote-author">
+            ${avatar ? `<img class="quote-avatar" src="${esc(avatar)}" onerror="this.style.display='none'">` : ''}
+            <span class="quote-name">${esc(name)}</span>
+            <span class="quote-time">${formatDate(ts)}</span>
+          </div>
+          <div class="quote-text">${previewText}</div>
+        </div>`;
+      el.querySelector('.quote-card').addEventListener('click', () => navigate(entityRef));
+    } catch {}
+  }
+}
+
+// -- Wire up nostr mention clicks after DOM insertion --
+function wireNostrLinks(container) {
+  container.querySelectorAll('[data-entity]').forEach(el => {
+    if (el.classList.contains('quote-card')) return; // handled separately
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      navigate(el.dataset.entity);
+    });
+  });
+}
+
+// -- Extract quoted event IDs from a note's content and tags --
+function extractQuotedEventIds(event) {
+  const ids = new Set();
+  for (const tag of event.tags) {
+    if (tag[0] === 'q' && tag[1]) ids.add(tag[1]);
+  }
+  const matches = event.content.matchAll(/nostr:(note1[a-z0-9]+|nevent1[a-z0-9]+)/g);
+  for (const m of matches) {
+    try {
+      const decoded = nip19.decode(m[1]);
+      const id = decoded.type === 'note' ? decoded.data : decoded.data?.id;
+      if (id) ids.add(id);
+    } catch {}
+  }
+  return [...ids];
+}
+
+// -- Speculatively prefetch a profile's feed data for instant rendering later --
+async function prefetchProfileFeed(pubkey) {
+  if (cache.feedState.has(pubkey)) return;
+
+  const PAGE = 10;
+
+  function isStandaloneNote(n) {
+    const eTags = n.tags.filter(t => t[0] === 'e');
+    if (!eTags.length) return true;
+    if (n.tags.some(t => t[0] === 'q')) return true;
+    if (eTags.some(t => t[3] === 'reply' || t[3] === 'root')) return false;
+    if (eTags.every(t => t[3] === 'mention' || t[3] === '')) return true;
+    if (n.content.includes('nostr:note') || n.content.includes('nostr:nevent')) return true;
+    return false;
+  }
+
+  function fetchPage(until, filterFn) {
+    return new Promise(resolve => {
+      const events = [];
+      const filter = { kinds: [1], authors: [pubkey], limit: PAGE * 3 };
+      if (until) filter.until = until;
+      const t = setTimeout(() => resolve(events), 8000);
+      pool.subscribeMany(DEFAULT_RELAYS, [filter], {
+        onevent(e) {
+          cacheEvent(e);
+          if (!filterFn || filterFn(e)) events.push(e);
+        },
+        oneose() { clearTimeout(t); resolve(events.slice(0, PAGE)); }
+      });
+    });
+  }
+
+  const rawNotes = await fetchPage(null, null);
+  const notes = rawNotes.filter(isStandaloneNote).sort((a, b) => b.created_at - a.created_at);
+  const notesUntil = notes.length ? notes[notes.length - 1].created_at - 1 : null;
+
+  const rawReplies = await fetchPage(null, e => e.tags.some(t => t[0] === 'e'));
+  const allReplies = rawReplies.sort((a, b) => b.created_at - a.created_at);
+  const repliesUntil = allReplies.length ? allReplies[allReplies.length - 1].created_at - 1 : null;
+
+  let allParentEvents = [];
+  let allParentProfiles = {};
+  if (allReplies.length) {
+    const parentIds = [...new Set(allReplies.map(r => {
+      const eTags = r.tags.filter(t => t[0] === 'e');
+      return eTags[eTags.length - 1]?.[1];
+    }).filter(Boolean))];
+    allParentEvents = await fetchEventsByIds(parentIds, DEFAULT_RELAYS);
+    const parentPubkeys = [...new Set(allParentEvents.map(e => e.pubkey))];
+    if (parentPubkeys.length) {
+      allParentProfiles = await fetchProfilesByPubkeys(parentPubkeys, DEFAULT_RELAYS);
+    }
+  }
+
+  if (!cache.feedState.has(pubkey)) {
+    cacheFeedState(pubkey, {
+      notesFeedCache: '', repliesFeedCache: '', activeTab: 'notes',
+      notes, notesUntil, notesLoaded: true,
+      allReplies, repliesUntil, repliesLoaded: true,
+      allParentEvents, allParentProfiles
+    });
+  }
+}
+
+// -- Prefetch footer profile feeds on home/about pages --
+function prefetchFooterProfiles() {
+  document.querySelectorAll('a.footer-nostr-link[data-entity]').forEach(el => {
+    try {
+      const decoded = nip19.decode(el.dataset.entity);
+      const pubkey = decoded.type === 'npub' ? decoded.data : decoded.data?.pubkey;
+      if (pubkey) {
+        fetchProfile(pubkey, DEFAULT_RELAYS);
+        prefetchProfileFeed(pubkey);
+      }
+    } catch {}
+  });
+}
+
+// -- Author header HTML (used in feed cards and longform) --
+function authorHeader(name, avatar, ts, pubkeyRaw) {
+  const inner = `
+    ${avatarHTML(avatar, name, 'note-avatar', 'note-avatar-placeholder')}
+    <div>
+      <div class="note-author-name">${esc(name)}</div>
+      ${ts ? `<div class="note-timestamp">${formatDate(ts)}</div>` : ''}
+    </div>`;
+  if (pubkeyRaw) {
+    return `<a class="note-header note-header-link" href="#" data-entity="${esc(pubkeyRaw)}" style="text-decoration:none;color:inherit">${inner}</a>`;
+  }
+  return `<div class="note-header">${inner}</div>`;
+}
+
+// -- Sidebar for note page --
+function noteSidebar(entity, author, authorPubkeyRaw, ts, authorPubkeyHex) {
+  const name   = author?.display_name || author?.name || '';
+  const avatar = author?.picture || '';
+  const nip05  = author?.nip05 || '';
+  const about  = author?.about || '';
+  const lud16  = author?.lud16 || '';
+
+  const d = ts;
+  const dateStr = d.toLocaleDateString('en-US', {weekday:'short', year:'numeric', month:'short', day:'numeric'});
+  const timeStr = d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+
+  const clientBtns = [
+    ...CLIENTS.native.map(c => `<a class="client-btn primary" href="${esc(c.url(entity))}">${esc(c.name)}</a>`),
+    ...CLIENTS.web.map(c => `<a class="client-btn" href="${esc(c.url(entity))}" target="_blank" rel="noopener">${esc(c.name)}</a>`),
+  ].join('');
+  const extraBtns = CLIENTS.extra.filter(c => !c.hideFor).map(c =>
+    `<a class="client-btn" href="${esc(c.url(entity))}" target="_blank" rel="noopener">${esc(c.name)}</a>`
+  ).join('');
+
+  return `
+    <div class="sidebar-section sidebar-author-section">
+      <div class="sidebar-label">Author</div>
+      <div class="sidebar-author">
+        <a class="sidebar-author-top" href="#" data-entity="${esc(authorPubkeyRaw)}">
+          ${avatarHTML(avatar, name, 'sidebar-avatar', 'sidebar-avatar-placeholder')}
+          <div>
+            <div class="sidebar-author-name">${esc(name || truncate(authorPubkeyRaw, 12))}</div>
+            ${nip05 ? `<div class="sidebar-author-nip05 nip05-pending" data-nip05-pubkey="${esc(authorPubkeyHex)}" data-nip05="${esc(nip05)}"><span class="nip05-check">✓</span> <span class="nip05-domain">${esc(formatNip05(nip05))}</span></div>` : ''}
+          </div>
+        </a>
+        ${about ? `<div class="sidebar-author-about">${renderBio(about)}</div>` : ''}
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Published</div>
+      <div class="sidebar-timestamp">
+        <span class="ts-date">${dateStr}</span>
+        ${timeStr}
+      </div>
+    </div>
+
+    ${lud16 ? `
+    <div class="sidebar-section">
+      <div class="sidebar-label">Zap</div>
+      <button class="zap-btn" id="note-zap-btn">Zap Post</button>
+    </div>
+    ` : ''}
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Open In</div>
+      <div class="sidebar-clients">
+        ${clientBtns}
+        <button class="client-more-btn" id="client-more-btn" aria-expanded="false">More <span class="chevron">▾</span></button>
+      </div>
+      <div class="client-extra" id="client-extra">${extraBtns}</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Identifier</div>
+      <div class="sidebar-id">${esc(entity.raw)}</div>
+    </div>
+  `;
+}
+
+// -- Ensure entity-content is a plain entity-wrap div (not note-layout) --
+function ensureEntityWrap() {
+  const entityView = document.getElementById('view-entity');
+  if (!entityView.querySelector('.entity-wrap')) {
+    entityView.innerHTML = '<div class="entity-wrap" id="entity-content"></div>';
+  }
+}
+
+// -- Build a feed note card HTML (with author header) --
+function feedNoteCard(event, authorMeta, raw, mentionProfiles = {}) {
+  const name   = displayName(authorMeta, event.pubkey);
+  const avatar = authorMeta?.picture || '';
+  const nip05  = authorMeta?.nip05 || '';
+  const ts     = new Date(event.created_at * 1000);
+  const preview = renderContent(event.content, mentionProfiles);
+  return `<div class="feed-note" data-entity="${esc(raw)}">
+    <div class="feed-note-header">
+      ${avatarHTML(avatar, name, 'feed-note-avatar', 'feed-note-avatar-ph')}
+      <span class="feed-note-author-name">${esc(name)}${nip05 ? `<span class="nip05-badge nip05-pending" data-nip05-pubkey="${esc(event.pubkey)}" data-nip05="${esc(nip05)}"><span class="nip05-check">✓</span></span>` : ''}</span>
+      <span class="feed-note-ts">${timeAgo(ts)}</span>
+    </div>
+    <div class="feed-note-body">${preview}</div>
+  </div>`;
+}
+
+// -- Build a reply thread card HTML --
+function replyThreadCard(replyEvent, parentEvent, profileMeta, parentMeta, mentionProfiles = {}) {
+  const selfName   = displayName(profileMeta, replyEvent.pubkey);
+  const selfAvatar = profileMeta?.picture || '';
+  const parentName = displayName(parentMeta, parentEvent?.pubkey || '');
+  const parentAvatar = parentMeta?.picture || '';
+  const replyRaw  = nip19.noteEncode(replyEvent.id);
+  const parentRaw = parentEvent ? nip19.noteEncode(parentEvent.id) : null;
+  const replyTs   = new Date(replyEvent.created_at * 1000);
+  const parentTs  = parentEvent ? new Date(parentEvent.created_at * 1000) : null;
+
+  const parentNpub = parentEvent ? nip19.npubEncode(parentEvent.pubkey) : null;
+
+  const parentSection = parentEvent ? `
+    <div class="reply-parent" data-entity="${esc(parentRaw)}">
+      <div class="reply-parent-header">
+        <span class="reply-parent-author" data-entity="${esc(parentNpub)}">
+          ${avatarHTML(parentAvatar, parentName, 'reply-parent-avatar', 'reply-parent-avatar-ph')}
+          <span class="reply-parent-name">${esc(parentName)}</span>
+        </span>
+        <span class="reply-parent-ts">${timeAgo(parentTs)}</span>
+      </div>
+      <div class="reply-parent-body">${renderContent(parentEvent.content, mentionProfiles)}</div>
+      <div class="reply-parent-readmore"><span>read more</span></div>
+      <div class="reply-parent-footer"></div>
+    </div>
+    <div class="reply-connector">
+      <div class="reply-connector-line"></div>
+      <span class="reply-connector-label">replied</span>
+    </div>` : '';
+
+  const replyContent = renderContent(replyEvent.content, mentionProfiles);
+
+  return `<div class="reply-thread">
+    ${parentSection}
+    <div class="reply-self" data-entity="${esc(replyRaw)}">
+      <div class="reply-self-header">
+        ${avatarHTML(selfAvatar, selfName, 'reply-self-avatar', 'reply-self-avatar-ph')}
+        <span class="reply-self-name">${esc(selfName)}</span>
+        <span class="reply-self-ts">${timeAgo(replyTs)}</span>
+      </div>
+      <div class="reply-self-body">${replyContent}</div>
+    </div>
+  </div>`;
+}
+
+// -- Wire clicks on a feed container --
+function wireFeedClicks(container) {
+  container.querySelectorAll('[data-entity]').forEach(el => {
+    // Author spans inside reply parents navigate to the profile, not the note
+    if (el.classList.contains('reply-parent-author')) {
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        navigate(el.dataset.entity);
+      });
+      return;
+    }
+    el.addEventListener('click', e => {
+      if (e.target.tagName === 'A' || e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') return;
+      // Don't fire if click was inside the author span or read more
+      if (e.target.closest('.reply-parent-author') || e.target.closest('.reply-parent-readmore')) return;
+      e.stopPropagation();
+      navigate(el.dataset.entity);
+    });
+  });
+  container.querySelectorAll('.feed-note, .reply-self, .reply-parent').forEach(el => {
+    resolveQuotes(el);
+    wireNostrLinks(el);
+  });
+  container.querySelectorAll('.reply-parent-body').forEach(body => {
+    if (body.scrollHeight > body.clientHeight + 1) {
+      const rm = body.parentElement.querySelector('.reply-parent-readmore');
+      if (rm) {
+        rm.classList.add('visible');
+        rm.querySelector('span').addEventListener('click', e => {
+          e.stopPropagation();
+          body.classList.toggle('expanded');
+          rm.querySelector('span').textContent = body.classList.contains('expanded') ? 'show less' : 'read more';
+        });
+      }
+    }
+  });
+}
+
+// -- Renderers --
+function renderProfile(entity, pubkey, meta) {
+  const name    = displayName(meta, pubkey, 16);
+  document.title = `${name} | NostrGate`;
+  const about   = meta?.about || '';
+  const avatar  = meta?.picture || '';
+  const banner  = meta?.banner || '';
+  const nip05   = meta?.nip05 || '';
+  const website = meta?.website || '';
+  const lud16   = meta?.lud16 || '';
+
+  ensureEntityWrap();
+  const container = document.getElementById('entity-content');
+  container.innerHTML = `
+    ${banner ? `<img class="profile-banner" src="${esc(banner)}" alt="banner" onerror="this.remove()">` : ''}
+    <div class="profile-header">
+      ${avatarHTML(avatar, name, 'profile-avatar', 'profile-avatar-placeholder')}
+      <div class="profile-name-block">
+        <div class="profile-name">${esc(name)}</div>
+        ${nip05 ? `<div class="profile-nip05 nip05-pending" data-nip05-pubkey="${esc(pubkey)}" data-nip05="${esc(nip05)}"><span class="nip05-check">✓</span> <span class="nip05-domain">${esc(formatNip05(nip05))}</span></div>` : ''}
+      </div>
+    </div>
+    ${about ? `<div class="profile-about" id="profile-about">${renderBio(about)}</div>` : '<div class="profile-about profile-about-empty">No bio set.</div>'}
+    <div class="profile-meta">
+      ${website ? `<span class="meta-item">🌐 <a href="${esc(website)}" target="_blank" rel="noopener" title="Open website">${esc(website.replace(/^https?:\/\//,''))}</a></span>` : ''}
+      ${lud16   ? `<span class="meta-item"><a class="zap-lud16-link" href="#" id="profile-zap-link" title="Click to zap">⚡ ${esc(lud16)}</a></span>` : ''}
+    </div>
+    <hr class="divider">
+    ${clientSection(entity, 'profile')}
+    ${rawIdBlock(entity.raw, pubkey)}
+    <hr class="divider">
+    <div class="feed-tabs">
+      <div class="feed-tab active" id="tab-notes">Recent Notes</div>
+      <div class="feed-tab" id="tab-replies">Recent Replies</div>
+    </div>
+    <div id="profile-feed"><div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div></div>
+  `;
+  showView('entity');
+  verifyNip05Badges(container);
+  wireClientMore();
+
+  // Wire profile zap link
+  const zapLink = document.getElementById('profile-zap-link');
+  if (zapLink) {
+    zapLink.addEventListener('click', e => {
+      e.preventDefault();
+      openZapModal(pubkey, lud16, null, name, avatar);
+    });
+  }
+
+  // Resolve npub/nprofile mentions in profile bio asynchronously (with or without nostr: prefix)
+  if (about) {
+    const bioEl = document.getElementById('profile-about');
+    if (bioEl) {
+      const bioMentions = [];
+      const bioMatches = about.matchAll(/(?:nostr:)?(npub1[a-z0-9]+|nprofile1[a-z0-9]+)/g);
+      for (const bm of bioMatches) {
+        try {
+          const decoded = nip19.decode(bm[1]);
+          const pk = decoded.type === 'npub' ? decoded.data : decoded.data?.pubkey;
+          if (pk) bioMentions.push(pk);
+        } catch {}
+      }
+      if (bioMentions.length) {
+        fetchProfilesByPubkeys(bioMentions, DEFAULT_RELAYS).then(bioProfiles => {
+          if (!document.getElementById('profile-about')) return;
+          bioEl.innerHTML = renderBio(about, bioProfiles);
+          wireNostrLinks(bioEl);
+        });
+      } else {
+        wireNostrLinks(bioEl);
+      }
+    }
+  }
+
+  const PAGE = 10;
+
+  // -- Notes tab state --
+  let notes = [];          // all loaded standalone notes
+  let notesUntil = null;   // oldest timestamp seen, for pagination
+  let notesLoaded = false;
+  let notesLoadingMore = false;
+  let prefetchedNotes = null;  // next page prefetched in background
+
+  // -- Replies tab state --
+  let repliesLoaded = false;
+  let repliesUntil = null;
+  let allReplies = [];
+  let allParentEvents = [];
+  let allParentProfiles = {};
+  let repliesLoadingMore = false;
+  let prefetchedReplies = null;  // next page prefetched in background
+
+  let activeTab = 'notes';
+  let notesFeedCache = '';
+  let repliesFeedCache = '';
+
+  function saveFeedState() {
+    cacheFeedState(pubkey, {
+      notesFeedCache, repliesFeedCache, activeTab,
+      notes, notesUntil, notesLoaded,
+      allReplies, repliesUntil, repliesLoaded,
+      allParentEvents, allParentProfiles
+    });
+  }
+
+  // -- Background prefetch of next page for instant "Load more" --
+  async function prefetchNextNotes() {
+    if (!notesUntil) return;
+    const raw = await fetchNotesPage(notesUntil);
+    const standalone = raw.filter(isStandaloneNote);
+    standalone.sort((a, b) => b.created_at - a.created_at);
+    if (standalone.length) prefetchedNotes = standalone;
+  }
+
+  async function prefetchNextReplies() {
+    if (!repliesUntil) return;
+    const replies = await fetchRepliesPage(repliesUntil);
+    replies.sort((a, b) => b.created_at - a.created_at);
+    if (replies.length) {
+      await hydrateParents(replies);
+      prefetchedReplies = replies;
+    }
+  }
+
+  // -- Helper: is this note a standalone (not a reply)? --
+  function isStandaloneNote(n) {
+    const eTags = n.tags.filter(t => t[0] === 'e');
+    if (!eTags.length) return true;
+    if (n.tags.some(t => t[0] === 'q')) return true;
+    if (eTags.some(t => t[3] === 'reply' || t[3] === 'root')) return false;
+    if (eTags.every(t => t[3] === 'mention' || t[3] === '')) return true;
+    if (n.content.includes('nostr:note') || n.content.includes('nostr:nevent')) return true;
+    return false;
+  }
+
+  // -- Fetch a page of notes, optionally before a timestamp --
+  async function fetchNotesPage(until) {
+    return new Promise(resolve => {
+      const events = [];
+      const filter = { kinds:[1], authors:[pubkey], limit: PAGE * 2 };
+      if (until) filter.until = until;
+      const t = setTimeout(() => resolve(events), 8000);
+      pool.subscribeMany(DEFAULT_RELAYS, [filter], {
+        onevent(e) { events.push(e); cacheEvent(e); },
+        oneose()   { clearTimeout(t); resolve(events); }
+      });
+    });
+  }
+
+  // -- Fetch a page of replies, optionally before a timestamp --
+  async function fetchRepliesPage(until) {
+    return new Promise(resolve => {
+      const events = [];
+      const filter = { kinds:[1], authors:[pubkey], limit: PAGE * 3 };
+      if (until) filter.until = until;
+      const t = setTimeout(() => resolve(events), 8000);
+      pool.subscribeMany(DEFAULT_RELAYS, [filter], {
+        onevent(e) { if (e.tags.some(t => t[0] === 'e')) { events.push(e); cacheEvent(e); } },
+        oneose()   { clearTimeout(t); resolve(events.slice(0, PAGE)); }
+      });
+    });
+  }
+
+  // -- Render the notes feed (appending new cards) --
+  async function appendNoteCards(newNotes) {
+    const feed = document.getElementById('profile-feed');
+    if (!feed) return;
+    // Remove existing load-more button if present
+    feed.querySelector('.feed-load-more')?.remove();
+    // Pre-fetch mention profiles for all notes
+    const mentionPubkeys = extractMentionedPubkeys(newNotes);
+    const mentionProfiles = await fetchProfilesByPubkeys(mentionPubkeys, DEFAULT_RELAYS);
+    if (feed.querySelector('.feed-loading')) feed.innerHTML = '';
+    const html = newNotes.map(n => feedNoteCard(n, meta, nip19.noteEncode(n.id), mentionProfiles)).join('');
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    [...tmp.children].forEach(el => { el.classList.add('feed-card-enter'); feed.appendChild(el); });
+    // Add load-more button
+    const more = document.createElement('div');
+    more.className = 'feed-load-more';
+    more.innerHTML = `<button class="btn-load-more" id="notes-load-more">Load more</button>`;
+    feed.appendChild(more);
+    wireFeedClicks(feed);
+    verifyNip05Badges(feed);
+    document.getElementById('notes-load-more').addEventListener('click', loadMoreNotes);
+    notesFeedCache = feed.innerHTML;
+    saveFeedState();
+    if (!prefetchedNotes) prefetchNextNotes();
+  }
+
+  async function renderNotesTab() {
+    const feed = document.getElementById('profile-feed');
+    if (!feed) return;
+    if (notesLoaded) return; // already rendered
+    feed.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+    const raw = await fetchNotesPage(null);
+    const standalone = raw.filter(isStandaloneNote);
+    standalone.sort((a,b) => b.created_at - a.created_at);
+    notes = standalone;
+    notesLoaded = true;
+    if (notes.length) notesUntil = notes[notes.length - 1].created_at - 1;
+    if (activeTab !== 'notes') return;
+    if (!notes.length) { feed.innerHTML = `<div class="feed-empty">No recent notes found.</div>`; return; }
+    await appendNoteCards(notes);
+  }
+
+  async function loadMoreNotes() {
+    if (notesLoadingMore) return;
+    notesFeedCache = '';
+    notesLoadingMore = true;
+    const btn = document.getElementById('notes-load-more');
+    let standalone;
+    if (prefetchedNotes) {
+      standalone = prefetchedNotes;
+      prefetchedNotes = null;
+    } else {
+      const loadMoreDiv = btn?.closest('.feed-load-more');
+      if (loadMoreDiv) loadMoreDiv.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+      const raw = await fetchNotesPage(notesUntil);
+      standalone = raw.filter(isStandaloneNote);
+      standalone.sort((a,b) => b.created_at - a.created_at);
+    }
+    notesLoadingMore = false;
+    if (!standalone.length) {
+      const more = document.querySelector('.feed-load-more');
+      if (more) more.remove();
+      return;
+    }
+    notes = [...notes, ...standalone];
+    notesUntil = standalone[standalone.length - 1].created_at - 1;
+    await appendNoteCards(standalone);
+  }
+
+  // -- Render the replies feed --
+  async function appendReplyCards(newReplies) {
+    const feed = document.getElementById('profile-feed');
+    if (!feed) return;
+    feed.querySelector('.feed-load-more')?.remove();
+    // Collect all events (replies + their parents) for mention pre-fetching
+    const allEventsForMentions = [...newReplies];
+    for (const r of newReplies) {
+      const eTags = r.tags.filter(t => t[0] === 'e');
+      const parentId = eTags[eTags.length - 1]?.[1];
+      const parent = allParentEvents.find(e => e.id === parentId);
+      if (parent) allEventsForMentions.push(parent);
+    }
+    const mentionPubkeys = extractMentionedPubkeys(allEventsForMentions);
+    const mentionProfiles = await fetchProfilesByPubkeys(mentionPubkeys, DEFAULT_RELAYS);
+    if (feed.querySelector('.feed-loading')) feed.innerHTML = '';
+    const html = newReplies.map(r => {
+      const eTags = r.tags.filter(t => t[0] === 'e');
+      const parentId = eTags[eTags.length - 1]?.[1];
+      const parent = allParentEvents.find(e => e.id === parentId) || null;
+      const parentMeta = parent ? (allParentProfiles[parent.pubkey] || null) : null;
+      return replyThreadCard(r, parent, meta, parentMeta, mentionProfiles);
+    }).join('');
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    [...tmp.children].forEach(el => { el.classList.add('feed-card-enter'); feed.appendChild(el); });
+    const more = document.createElement('div');
+    more.className = 'feed-load-more';
+    more.innerHTML = `<button class="btn-load-more" id="replies-load-more">Load more</button>`;
+    feed.appendChild(more);
+    wireFeedClicks(feed);
+    document.getElementById('replies-load-more').addEventListener('click', loadMoreReplies);
+    repliesFeedCache = feed.innerHTML;
+    saveFeedState();
+    if (!prefetchedReplies) prefetchNextReplies();
+  }
+
+  async function hydrateParents(replies) {
+    const parentIds = [...new Set(replies.map(r => {
+      const eTags = r.tags.filter(t => t[0] === 'e');
+      return eTags[eTags.length - 1]?.[1];
+    }).filter(Boolean))];
+    const newIds = parentIds.filter(id => !allParentEvents.find(e => e.id === id));
+    if (newIds.length) {
+      const fetched = await fetchEventsByIds(newIds, DEFAULT_RELAYS);
+      allParentEvents = [...allParentEvents, ...fetched];
+      const newPubkeys = [...new Set(fetched.map(e => e.pubkey))].filter(pk => !allParentProfiles[pk]);
+      if (newPubkeys.length) {
+        const profiles = await fetchProfilesByPubkeys(newPubkeys, DEFAULT_RELAYS);
+        Object.assign(allParentProfiles, profiles);
+      }
+    }
+  }
+
+  async function renderRepliesTab() {
+    const feed = document.getElementById('profile-feed');
+    if (!feed) return;
+    if (repliesLoaded) return;
+    feed.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+    const replies = await fetchRepliesPage(null);
+    replies.sort((a,b) => b.created_at - a.created_at);
+    allReplies = replies;
+    repliesLoaded = true;
+    if (replies.length) {
+      repliesUntil = replies[replies.length - 1].created_at - 1;
+      await hydrateParents(replies);
+    }
+    if (activeTab !== 'replies') return;
+    if (!replies.length) { feed.innerHTML = `<div class="feed-empty">No recent replies found.</div>`; return; }
+    await appendReplyCards(replies);
+  }
+
+  async function loadMoreReplies() {
+    if (repliesLoadingMore) return;
+    repliesFeedCache = '';
+    repliesLoadingMore = true;
+    const btn = document.getElementById('replies-load-more');
+    let replies;
+    if (prefetchedReplies) {
+      replies = prefetchedReplies;
+      prefetchedReplies = null;
+    } else {
+      const loadMoreDiv = btn?.closest('.feed-load-more');
+      if (loadMoreDiv) loadMoreDiv.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+      replies = await fetchRepliesPage(repliesUntil);
+      replies.sort((a,b) => b.created_at - a.created_at);
+      if (replies.length) await hydrateParents(replies);
+    }
+    repliesLoadingMore = false;
+    if (!replies.length) {
+      document.querySelector('.feed-load-more')?.remove();
+      return;
+    }
+    allReplies = [...allReplies, ...replies];
+    repliesUntil = replies[replies.length - 1].created_at - 1;
+    await appendReplyCards(replies);
+  }
+
+  // Tab click handlers
+  document.getElementById('tab-notes').addEventListener('click', () => {
+    if (activeTab === 'notes') return;
+    activeTab = 'notes';
+    document.getElementById('tab-notes').classList.add('active');
+    document.getElementById('tab-replies').classList.remove('active');
+    // Swap feed content
+    const feed = document.getElementById('profile-feed');
+    if (!feed) return;
+    if (!notesLoaded) {
+      renderNotesTab();
+    } else if (notesFeedCache) {
+      feed.innerHTML = notesFeedCache;
+      wireFeedClicks(feed);
+      verifyNip05Badges(feed);
+      document.getElementById('notes-load-more')?.addEventListener('click', loadMoreNotes);
+    } else {
+      feed.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+      appendNoteCards(notes);
+    }
+  });
+  document.getElementById('tab-replies').addEventListener('click', () => {
+    if (activeTab === 'replies') return;
+    activeTab = 'replies';
+    document.getElementById('tab-replies').classList.add('active');
+    document.getElementById('tab-notes').classList.remove('active');
+    const feed = document.getElementById('profile-feed');
+    if (!feed) return;
+    if (!repliesLoaded) {
+      renderRepliesTab();
+    } else if (repliesFeedCache) {
+      feed.innerHTML = repliesFeedCache;
+      wireFeedClicks(feed);
+      verifyNip05Badges(feed);
+      document.getElementById('replies-load-more')?.addEventListener('click', loadMoreReplies);
+    } else {
+      feed.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+      appendReplyCards(allReplies);
+    }
+  });
+
+  // Check for cached feed state (back navigation)
+  const cached = cache.feedState.get(pubkey);
+  if (cached) {
+    // Restore state from cache
+    notes = cached.notes; notesUntil = cached.notesUntil; notesLoaded = cached.notesLoaded;
+    allReplies = cached.allReplies; repliesUntil = cached.repliesUntil; repliesLoaded = cached.repliesLoaded;
+    allParentEvents = cached.allParentEvents; allParentProfiles = cached.allParentProfiles;
+    notesFeedCache = cached.notesFeedCache; repliesFeedCache = cached.repliesFeedCache;
+    activeTab = cached.activeTab;
+    // Restore active tab styling
+    if (activeTab === 'replies') {
+      document.getElementById('tab-replies').classList.add('active');
+      document.getElementById('tab-notes').classList.remove('active');
+    }
+    // Inject cached HTML instantly
+    const feedHTML = activeTab === 'notes' ? notesFeedCache : repliesFeedCache;
+    if (feedHTML) {
+      const feed = document.getElementById('profile-feed');
+      feed.innerHTML = feedHTML;
+      wireFeedClicks(feed);
+      verifyNip05Badges(feed);
+      if (activeTab === 'notes') {
+        document.getElementById('notes-load-more')?.addEventListener('click', loadMoreNotes);
+      } else {
+        document.getElementById('replies-load-more')?.addEventListener('click', loadMoreReplies);
+      }
+    } else {
+      // Data prefetched but no HTML yet — render cards directly
+      if (activeTab === 'notes') {
+        if (notes.length) appendNoteCards(notes);
+        else { notesLoaded = false; renderNotesTab(); }
+      } else {
+        if (allReplies.length) appendReplyCards(allReplies);
+        else { repliesLoaded = false; renderRepliesTab(); }
+      }
+    }
+    if (!cached.repliesLoaded) prefetchReplies();
+  } else {
+    // First visit — load fresh
+    renderNotesTab();
+    prefetchReplies();
+  }
+
+  async function prefetchReplies() {
+    const replies = await fetchRepliesPage(null);
+    replies.sort((a,b) => b.created_at - a.created_at);
+    allReplies = replies;
+    if (replies.length) {
+      repliesUntil = replies[replies.length - 1].created_at - 1;
+      await hydrateParents(replies);
+    }
+    repliesLoaded = true;
+  }
+}
+
+function renderNote(entity, event, author) {
+  const name      = displayName(author, event.pubkey, 16);
+  document.title = `Note by ${name} | NostrGate`;
+  const avatar    = author?.picture || '';
+  const nip05     = author?.nip05 || '';
+  const ts        = new Date(event.created_at * 1000);
+  const authorNpub = nip19.npubEncode(event.pubkey);
+
+  // Replace default entity-wrap with two-column note-layout
+  const entityView = document.getElementById('view-entity');
+  entityView.innerHTML = '<div class="note-layout" id="entity-content"></div>';
+
+  const container = document.getElementById('entity-content');
+
+  const relativeTime = timeAgo(ts);
+  const fullTime = formatDate(ts);
+
+  container.innerHTML = `
+    <div class="note-main">
+      <a class="note-main-author" href="#" data-entity="${esc(authorNpub)}">
+        ${avatarHTML(avatar, name, 'note-main-avatar', 'note-main-avatar-placeholder')}
+        <div class="note-main-author-info">
+          <span class="note-main-name">${esc(name)}</span>
+          ${nip05 ? `<span class="note-main-nip05 nip05-pending" data-nip05-pubkey="${esc(event.pubkey)}" data-nip05="${esc(nip05)}"><span class="nip05-check">✓</span> <span class="nip05-domain">${esc(formatNip05(nip05))}</span></span>` : ''}
+        </div>
+        <span class="note-main-time" title="${esc(fullTime)}">${esc(relativeTime)}</span>
+      </a>
+      <div class="note-main-divider"></div>
+      <div class="note-card">
+        <div class="note-content" id="note-body"><div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span></div></div>
+      </div>
+    </div>
+    <div class="note-sidebar" id="note-sidebar"></div>
+  `;
+
+  // Render sidebar
+  document.getElementById('note-sidebar').innerHTML = noteSidebar(entity, author, authorNpub, ts, event.pubkey);
+
+  // Wire all author/entity links in both main and sidebar
+  container.querySelectorAll('[data-entity]').forEach(el => {
+    el.addEventListener('click', e => { e.preventDefault(); navigate(el.dataset.entity); });
+  });
+
+  // Collect mentioned pubkeys from tags and content for name resolution
+  const mentionedPubkeys = extractMentionedPubkeys([event]);
+  fetchProfilesByPubkeys(mentionedPubkeys, DEFAULT_RELAYS).then(profiles => {
+    const body = document.getElementById('note-body');
+    if (!body) return;
+    body.innerHTML = renderContent(event.content, profiles);
+    resolveQuotes(body);
+    wireNostrLinks(body);
+  });
+
+  showView('entity');
+  verifyNip05Badges(container);
+  wireClientMore();
+
+  // Wire zap button if present
+  const zapBtn = document.getElementById('note-zap-btn');
+  if (zapBtn) {
+    zapBtn.addEventListener('click', () => {
+      openZapModal(event.pubkey, author.lud16, event.id, name, avatar);
+    });
+  }
+
+  // Speculative prefetch: author's profile feed, then quoted post author
+  prefetchProfileFeed(event.pubkey).then(() => {
+    const quotedIds = extractQuotedEventIds(event);
+    if (quotedIds.length) {
+      fetchEventsByIds(quotedIds, DEFAULT_RELAYS).then(quotedEvents => {
+        if (quotedEvents.length) {
+          const quotedPubkey = quotedEvents[0].pubkey;
+          if (quotedPubkey !== event.pubkey) {
+            prefetchProfileFeed(quotedPubkey);
+          }
+        }
+      });
+    }
+  });
+}
+
+function renderLiveStream(entity, event, author) {
+  const tagsMap = {};
+  const allTags = event.tags;
+  // Build map of first value per tag key, plus collect all 'p' tags for participants
+  allTags.forEach(t => { if (!tagsMap[t[0]]) tagsMap[t[0]] = t[1]; });
+
+  const title      = tagsMap.title || tagsMap.subject || 'Live Stream';
+  document.title = `${title} | NostrGate`;
+  const summary    = tagsMap.summary || tagsMap.about || '';
+  const image      = tagsMap.image || tagsMap.thumb || tagsMap.thumbnail || '';
+  const status     = (tagsMap.status || '').toLowerCase(); // 'live' | 'ended' | ''
+  const streaming  = tagsMap.streaming || '';
+  const recording  = tagsMap.recording || '';
+  const startTs    = tagsMap.starts ? parseInt(tagsMap.starts) * 1000 : null;
+  const endTs      = tagsMap.ends   ? parseInt(tagsMap.ends)   * 1000 : null;
+  const viewerCount = tagsMap.current_participants || '';
+  const totalCount  = tagsMap.total_participants || '';
+  const hashtags    = allTags.filter(t => t[0] === 't').map(t => t[1]);
+
+  // Participants: p tags with optional relay, petname, role
+  const participants = allTags
+    .filter(t => t[0] === 'p' && t[1])
+    .map(t => ({ pubkey: t[1], relay: t[2]||'', petname: t[3]||'', role: t[4]||'' }));
+
+  // Host: prefer p tag with role 'host', fall back to event author
+  const hostParticipant = participants.find(p => p.role.toLowerCase() === 'host');
+  const hostPubkey = hostParticipant?.pubkey || event.pubkey;
+  const hostNpub   = nip19.npubEncode(hostPubkey);
+  // Use author profile if it matches, otherwise we'll hydrate after render
+  const hostMeta   = hostPubkey === event.pubkey ? author : null;
+  const hostName   = hostMeta?.display_name || hostMeta?.name || hostParticipant?.petname || truncate(hostPubkey, 16);
+  const hostAvatar = hostMeta?.picture || '';
+
+  // Status logic: prefer explicit tag, fallback to time-based
+  const isLive = status === 'live' ||
+    (!status && startTs && !endTs && Date.now() > startTs);
+  const isEnded = status === 'ended' ||
+    (!status && endTs && Date.now() > endTs);
+
+  const badgeHtml = isLive
+    ? `<span class="live-badge is-live"><span class="live-badge-dot"></span>LIVE</span>`
+    : `<span class="live-badge is-ended"><span class="live-badge-dot"></span>ENDED</span>`;
+
+  const startedText = startTs
+    ? `Started ${timeAgo(new Date(startTs))}`
+    : endTs ? `Ended ${timeAgo(new Date(endTs))}` : '';
+
+  const metaItems = [
+    hostName ? `<div class="live-meta-item">
+      ${hostAvatar ? `<img src="${esc(hostAvatar)}" style="width:18px;height:18px;border-radius:3px;object-fit:cover" onerror="this.style.display='none'" id="live-host-avatar">` : '<span id="live-host-avatar-ph"></span>'}
+      <strong><a href="#" data-entity="${esc(hostNpub)}" style="color:inherit;text-decoration:none" class="live-host-link" id="live-host-name-link">${esc(hostName)}</a></strong>
+    </div>` : '',
+    viewerCount ? `<div class="live-meta-item">👁 <strong>${esc(viewerCount)}</strong> watching</div>` : '',
+    totalCount  ? `<div class="live-meta-item">👥 <strong>${esc(totalCount)}</strong> total</div>` : '',
+    startedText ? `<div class="live-meta-item">${esc(startedText)}</div>` : '',
+  ].filter(Boolean).join('');
+
+  const tagsHtml = hashtags.length
+    ? `<div class="live-tags-row">${hashtags.map(t => `<span class="live-tag">#${esc(t)}</span>`).join('')}</div>`
+    : '';
+
+  // Build player or fallback block - inserted into DOM first, then wired up after
+  const playerUrl = isLive ? (streaming || recording) : (recording || streaming);
+  const isHls = playerUrl && (playerUrl.includes('.m3u8') || playerUrl.includes('hls'));
+  const isDirect = playerUrl && VIDEO_EXTS.test(playerUrl);
+  const canEmbed = playerUrl && (isHls || isDirect);
+
+  const noStreamHtml = `<div class="live-no-stream">
+    <div class="live-no-stream-icon">${isLive ? '📡' : '🎬'}</div>
+    <div class="live-no-stream-text">${isLive ? 'No stream URL available. Open in a Nostr client below to watch.' : `This stream has ended.${recording ? '' : ' No recording available.'}`}</div>
+  </div>`;
+
+  const mediaBlockHtml = canEmbed ? `
+    <div class="live-player-wrap" id="live-player-wrap">
+      <video id="live-video" controls playsinline ${isLive ? 'autoplay' : ''} preload="${isLive ? 'auto' : 'metadata'}"></video>
+    </div>` : `
+    <div class="live-no-stream">
+      <div class="live-no-stream-icon">${isLive ? '📡' : '🎬'}</div>
+      <div class="live-no-stream-text">
+        ${isLive
+          ? 'No stream URL available. Open in a Nostr client below to watch.'
+          : `This stream has ended.${recording ? `<br><a href="${esc(recording)}" target="_blank" rel="noopener">Watch the recording ↗</a>` : ' No recording available.'}`
+        }
+      </div>
+    </div>`;
+
+  ensureEntityWrap();
+  const wrap = document.getElementById('view-entity');
+  wrap.innerHTML = '<div class="live-wrap" id="entity-content"></div>';
+  const container = document.getElementById('entity-content');
+
+  container.innerHTML = `
+    <div class="live-status-bar">
+      ${badgeHtml}
+      ${startedText ? `<span class="live-started">${esc(startedText)}</span>` : ''}
+    </div>
+
+    ${image && !canEmbed ? `<img class="live-cover" src="${esc(image)}" alt="cover" onerror="this.remove()">` : ''}
+
+    <h1 class="live-title">${esc(title)}</h1>
+    ${summary ? `<div class="live-summary">${esc(summary)}</div>` : ''}
+
+    ${metaItems || author?.lud16 ? `<div class="live-meta-row">${metaItems}${author?.lud16 ? `<button class="zap-btn-sm" id="stream-zap-btn">Zap Stream</button>` : ''}</div>` : ''}
+    ${tagsHtml}
+
+    ${mediaBlockHtml}
+
+    ${participants.length ? `
+    <div class="live-participants">
+      <div class="live-participants-label">// Participants</div>
+      <div class="live-participants-list" id="live-participants-list">
+        ${participants.map(p => `
+          <div class="live-participant" data-pubkey="${esc(p.pubkey)}">
+            <img src="" alt="" style="display:none">
+            <div>
+              <div class="live-participant-name">${esc(p.petname || truncate(p.pubkey, 10))}</div>
+              ${p.role ? `<div class="live-participant-role">${esc(p.role)}</div>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <hr class="divider">
+    ${clientSection(entity, 'live')}
+    ${rawIdBlock(entity.raw, event.id)}
+  `;
+
+  showView('entity');
+  wireClientMore();
+
+  // Wire zap button
+  const streamZapBtn = document.getElementById('stream-zap-btn');
+  if (streamZapBtn) {
+    const authorName = displayName(author, event.pubkey, 16);
+    const authorAvatar = author?.picture || '';
+    streamZapBtn.addEventListener('click', () => {
+      openZapModal(event.pubkey, author.lud16, event.id, authorName, authorAvatar);
+    });
+  }
+
+  // Wire video player
+  if (canEmbed) {
+    const videoEl = document.getElementById('live-video');
+    if (videoEl) {
+      const wrapEl = document.getElementById('live-player-wrap');
+      const onError = () => {
+        if (image) {
+          const img = document.createElement('img');
+          img.className = 'live-cover';
+          img.alt = 'cover';
+          img.src = image;
+          img.onerror = () => {
+            img.replaceWith(Object.assign(document.createElement('div'), { innerHTML: noStreamHtml }).firstChild);
+          };
+          wrapEl.replaceWith(img);
+        } else {
+          wrapEl.outerHTML = noStreamHtml;
+        }
+      };
+      if (isHls && Hls.isSupported()) {
+        const hls = new Hls({ enableWorker: false });
+        hls.loadSource(playerUrl);
+        hls.attachMedia(videoEl);
+        hls.on(Hls.Events.ERROR, (e, data) => { if (data.fatal) onError(); });
+      } else if (videoEl.canPlayType('application/vnd.apple.mpegurl') || isDirect) {
+        // Safari native HLS or direct video
+        videoEl.src = playerUrl;
+        videoEl.addEventListener('error', onError);
+      } else {
+        onError();
+      }
+    }
+  }
+
+  // Wire host link
+  container.querySelectorAll('.live-host-link[data-entity]').forEach(el => {
+    el.addEventListener('click', e => { e.preventDefault(); navigate(el.dataset.entity); });
+  });
+
+  // Hydrate host profile if it wasn't the event author (p tag host)
+  if (hostPubkey !== event.pubkey) {
+    fetchProfile(hostPubkey, DEFAULT_RELAYS).then(meta => {
+      if (!meta) return;
+      const nameEl = document.getElementById('live-host-name-link');
+      const avatarEl = document.getElementById('live-host-avatar');
+      const avatarPh = document.getElementById('live-host-avatar-ph');
+      if (nameEl && (meta.display_name || meta.name)) nameEl.textContent = meta.display_name || meta.name;
+      if (meta.picture) {
+        const img = document.createElement('img');
+        img.src = meta.picture;
+        img.style.cssText = 'width:18px;height:18px;border-radius:3px;object-fit:cover;margin-right:4px';
+        img.onerror = () => img.remove();
+        if (avatarEl) avatarEl.replaceWith(img);
+        else if (avatarPh) avatarPh.replaceWith(img);
+      }
+    });
+  }
+
+  // Wire participant clicks + hydrate their avatars/names
+  const participantEls = container.querySelectorAll('.live-participant[data-pubkey]');
+  participantEls.forEach(el => {
+    const pubkey = el.dataset.pubkey;
+    el.addEventListener('click', () => navigate(nip19.npubEncode(pubkey)));
+    fetchProfile(pubkey, DEFAULT_RELAYS).then(meta => {
+      if (!meta) return;
+      const nameEl = el.querySelector('.live-participant-name');
+      const imgEl  = el.querySelector('img');
+      if (nameEl && (meta.display_name || meta.name)) {
+        nameEl.textContent = meta.display_name || meta.name;
+      }
+      if (imgEl && meta.picture) {
+        imgEl.src = meta.picture;
+        imgEl.style.display = '';
+        imgEl.onerror = () => imgEl.style.display = 'none';
+      }
+    });
+  });
+}
+
+function renderLongform(entity, event, author) {
+  const tags    = Object.fromEntries(event.tags.map(t => [t[0], t[1]]));
+  const title   = tags.title || 'Untitled';
+  document.title = `${title} | NostrGate`;
+  const summary = tags.summary || '';
+  const image   = tags.image || '';
+  const name    = displayName(author, event.pubkey, 16);
+  const avatar  = author?.picture || '';
+  const ts      = new Date((tags.published_at || event.created_at) * 1000);
+  const body    = renderMarkdown(event.content);
+  const authorNpub = nip19.npubEncode(event.pubkey);
+
+  ensureEntityWrap();
+  const container = document.getElementById('entity-content');
+  container.innerHTML = `
+    ${image ? `<img class="profile-banner" src="${esc(image)}" alt="cover" style="margin-bottom:2rem" onerror="this.remove()">` : ''}
+    <h1 class="longform-title">${esc(title)}</h1>
+    ${summary ? `<div class="longform-summary">${esc(summary)}</div>` : ''}
+    ${authorHeader(name, avatar, ts, authorNpub)}
+    <hr class="divider">
+    <div class="longform-body">${body}</div>
+    <hr class="divider">
+    ${author?.lud16 ? `<div class="zap-inline-section"><button class="zap-btn" id="longform-zap-btn">Zap Post</button></div><hr class="divider">` : ''}
+    ${clientSection(entity, 'longform')}
+    ${rawIdBlock(entity.raw, event.id)}
+  `;
+  // Wire author header click
+  container.querySelectorAll('.note-header-link[data-entity]').forEach(el => {
+    el.addEventListener('click', e => { e.preventDefault(); navigate(el.dataset.entity); });
+  });
+  showView('entity');
+  wireClientMore();
+
+  // Wire zap button
+  const longformZapBtn = document.getElementById('longform-zap-btn');
+  if (longformZapBtn) {
+    longformZapBtn.addEventListener('click', () => {
+      openZapModal(event.pubkey, author.lud16, event.id, name, avatar);
+    });
+  }
+}
+
+// -- Client picker --
+function clientSection(entity, kind) {
+  const webClients  = kind === 'live' ? CLIENTS.live : CLIENTS.web;
+  const extraShown  = kind !== 'live'; // show More only for non-live (live has fewer clients)
+
+  const nativeBtns = CLIENTS.native.map(c =>
+    `<a class="client-btn${c.primary?' primary':''}" href="${esc(c.url(entity))}"><span class="dot"></span>${esc(c.name)}</a>`
+  ).join('');
+  const webBtns = webClients.map(c =>
+    `<a class="client-btn" href="${esc(c.url(entity))}" target="_blank" rel="noopener"><span class="dot"></span>${esc(c.name)}</a>`
+  ).join('');
+  const extraBtns = CLIENTS.extra.filter(c => !c.hideFor || !c.hideFor.includes(kind)).map(c =>
+    `<a class="client-btn" href="${esc(c.url(entity))}" target="_blank" rel="noopener"><span class="dot"></span>${esc(c.name)}</a>`
+  ).join('');
+
+  const moreHtml = extraShown ? `
+    <button class="client-more-btn" id="client-more-btn" aria-expanded="false">More <span class="chevron">▾</span></button>
+    <div class="client-extra" id="client-extra">${extraBtns}</div>` : '';
+
+  return `<div class="client-section">
+    <div class="client-label">Open in your client</div>
+    <div class="client-grid" id="client-grid">${nativeBtns}${webBtns}${extraShown ? `<button class="client-more-btn" id="client-more-btn" aria-expanded="false">More <span class="chevron">▾</span></button>` : ''}</div>
+    ${extraShown ? `<div class="client-extra" id="client-extra">${extraBtns}</div>` : ''}
+  </div>`;
+}
+
+function wireClientMore() {
+  const btn   = document.getElementById('client-more-btn');
+  const extra = document.getElementById('client-extra');
+  if (!btn || !extra) return;
+  btn.addEventListener('click', () => {
+    const open = extra.classList.toggle('open');
+    btn.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open);
+  });
+}
+
+function rawIdBlock(raw, hex) {
+  return `<div class="raw-id-block">
+    <div class="raw-id-label">NIP-19 Identifier</div>
+    <div class="raw-id-value">${esc(raw)}</div>
+    ${hex && hex !== raw ? `<div class="raw-id-label" style="margin-top:.6rem">Hex</div><div class="raw-id-value">${esc(hex)}</div>` : ''}
+  </div>`;
+}
+
+// -- Helpers --
+function showError(msg) { document.title = 'Error | NostrGate'; document.getElementById('error-msg').textContent = msg; showView('error'); window.scrollTo({top:0,behavior:'instant'}); }
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function truncate(s, n) { return s.length > n ? s.slice(0,n)+'…' : s; }
+
+function displayName(meta, pubkey, len = 12) {
+  return meta?.display_name || meta?.name || truncate(pubkey, len);
+}
+
+function avatarHTML(avatar, name, imgClass, phClass) {
+  const initial = esc((name || '?')[0].toUpperCase());
+  const img = avatar
+    ? `<img class="${imgClass}" src="${esc(avatar)}" alt="${esc(name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const ph = `<div class="${phClass}" ${avatar ? 'style="display:none"' : ''}>${initial}</div>`;
+  return img + ph;
+}
+
+function formatNip05(nip05) {
+  return nip05.startsWith('_@') ? nip05.slice(2) : nip05;
+}
+
+function closeZapSub() {
+  if (zapState.zapSub) {
+    try { zapState.zapSub.close(); } catch {}
+    zapState.zapSub = null;
+  }
+}
+
+function formatDate(d) {
+  return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+function linkify(text) {
+  // Convert URLs in plain text to anchor tags, escape everything else
+  const urlRe = /https?:\/\/[^\s<>"']+/g;
+  let result = '';
+  let last = 0;
+  let m;
+  while ((m = urlRe.exec(text)) !== null) {
+    result += esc(text.slice(last, m.index));
+    result += `<a class="inline-link" href="${esc(m[0])}" target="_blank" rel="noopener">${esc(m[0])}</a>`;
+    last = m.index + m[0].length;
+  }
+  result += esc(text.slice(last));
+  return result;
+}
+
+function renderBio(text, mentionProfiles = {}) {
+  // Render bio text with URLs, nostr: references, bare npub/note/etc, and line breaks
+  const tokenRe = /(https?:\/\/[^\s<>"']+|nostr:(?:npub1|nprofile1|note1|nevent1|naddr1)[a-z0-9]+|(?:npub1|nprofile1|note1|nevent1|naddr1)[a-z0-9]+)/g;
+  let result = '';
+  let last = 0;
+  let m;
+  while ((m = tokenRe.exec(text)) !== null) {
+    result += esc(text.slice(last, m.index));
+    const token = m[0];
+    // Extract the bech32 ref (strip nostr: prefix if present)
+    const ref = token.startsWith('nostr:') ? token.slice(6) : token;
+    if (/^(npub1|nprofile1|note1|nevent1|naddr1)/.test(ref)) {
+      try {
+        const decoded = nip19.decode(ref);
+        if (decoded.type === 'npub' || decoded.type === 'nprofile') {
+          const pk = decoded.type === 'npub' ? decoded.data : decoded.data.pubkey;
+          const meta = mentionProfiles[pk];
+          const name = displayName(meta, pk);
+          result += `<a class="nostr-mention" href="#${esc(ref)}" data-entity="${esc(ref)}">@${esc(name)}</a>`;
+        } else if (decoded.type === 'note' || decoded.type === 'nevent' || decoded.type === 'naddr') {
+          const label = ref.slice(0, 20) + '…';
+          result += `<a class="nostr-mention" href="#${esc(ref)}" data-entity="${esc(ref)}">${esc(label)}</a>`;
+        } else {
+          result += `<a class="nostr-mention" href="#${esc(ref)}" data-entity="${esc(ref)}">${esc(token)}</a>`;
+        }
+      } catch {
+        result += esc(token);
+      }
+    } else {
+      result += `<a class="inline-link" href="${esc(token)}" target="_blank" rel="noopener">${esc(token)}</a>`;
+    }
+    last = m.index + m[0].length;
+  }
+  result += esc(text.slice(last));
+  result = result.replace(/(^|\s)(#[a-zA-Z]\w{0,49})(?=[\s,.:;!?]|$)/g, '$1<span class="hashtag">$2</span>');
+  return result.replace(/\n/g, '<br>');
+}
+
+function timeAgo(d) {
+  const sec = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (sec < 60)   return `${sec}s ago`;
+  if (sec < 3600) return `${Math.floor(sec/60)}m ago`;
+  if (sec < 86400) return `${Math.floor(sec/3600)}h ago`;
+  if (sec < 604800) return `${Math.floor(sec/86400)}d ago`;
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+// -- Markdown rendering (via marked) --
+marked.setOptions({ breaks: true, gfm: true });
+
+const markedRenderer = new marked.Renderer();
+
+// Security: only allow http/https links, open in new tab
+markedRenderer.link = ({ href, title, text }) => {
+  if (!/^https?:\/\//i.test(href)) return text;
+  const t = title ? ` title="${esc(title)}"` : '';
+  return `<a href="${esc(href)}"${t} target="_blank" rel="noopener">${text}</a>`;
+};
+
+// Image rendering with styling
+markedRenderer.image = ({ href, title, text }) => {
+  if (!/^https?:\/\//i.test(href)) return esc(text);
+  return `<img src="${esc(href)}" alt="${esc(text)}" class="inline-img" loading="lazy">`;
+};
+
+// Escape raw HTML tokens to prevent XSS from user content
+markedRenderer.html = ({ text }) => esc(text);
+
+marked.use({ renderer: markedRenderer });
+
+function renderMarkdown(md) {
+  let html = marked.parse(md);
+  // Post-process: promote bare-URL <a> tags to <img>/<video>/<audio> when appropriate
+  html = html.replace(/<a href="([^"]+)"[^>]*>\1<\/a>/g, (match, url) => {
+    if (IMAGE_EXTS.test(url)) return `<img src="${esc(url)}" class="inline-img" loading="lazy">`;
+    if (VIDEO_EXTS.test(url)) return `<div class="media-block"><video class="inline-video" controls src="${esc(url)}"></video></div>`;
+    if (AUDIO_EXTS.test(url)) return `<audio controls src="${esc(url)}" class="inline-audio"></audio>`;
+    return match;
+  });
+  return html;
+}
+
+// -- Init --
+function goAbout() {
+  document.title = 'About | NostrGate';
+  history.pushState({}, '', '#about');
+  window.scrollTo({top:0,behavior:'instant'});
+  showView('about');
+}
+
+// -- ZAP FUNCTIONS --
+let zapState = { recipientPubkey: null, lud16: null, eventId: null, recipientName: '', recipientAvatar: '', bolt11: null, zapSub: null };
+
+function generateZapKeypair() {
+  const sk = generateSecretKey();
+  const pk = getPublicKey(sk);
+  return { sk, pk };
+}
+
+function publishNostrGateProfile(sk, pk) {
+  try {
+    const event = finalizeEvent({
+      kind: 0,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [],
+      content: JSON.stringify({
+        name: 'NostrGate',
+        display_name: 'NostrGate',
+        about: 'Anonymous zap sent via NostrGate – nostrgate.5t34k.com',
+        picture: NOSTRGATE_ICON
+      })
+    }, sk);
+    pool.publish(DEFAULT_RELAYS, event);
+  } catch (e) {
+    // fire and forget
+  }
+}
+
+async function fetchLnurlPayEndpoint(lud16) {
+  const parts = lud16.split('@');
+  if (parts.length !== 2) throw new Error('Invalid lightning address format');
+  const [name, domain] = parts;
+  const res = await fetch(`https://${domain}/.well-known/lnurlp/${name}`);
+  if (!res.ok) throw new Error(`Lightning provider returned ${res.status}`);
+  const data = await res.json();
+  if (data.status === 'ERROR') throw new Error(data.reason || 'Lightning provider error');
+  if (!data.callback) throw new Error('Lightning provider missing callback URL');
+  return data;
+}
+
+function createZapRequest(recipientPubkey, eventId, amount, message, sk, pk) {
+  const msats = amount * 1000;
+  const tags = [
+    ['relays', ...DEFAULT_RELAYS],
+    ['amount', String(msats)],
+    ['p', recipientPubkey]
+  ];
+  if (eventId) tags.push(['e', eventId]);
+  const event = finalizeEvent({
+    kind: 9734,
+    created_at: Math.floor(Date.now() / 1000),
+    tags,
+    content: message
+  }, sk);
+  return event;
+}
+
+async function requestInvoice(lnurlData, zapRequest, amountMsats) {
+  const encoded = encodeURIComponent(JSON.stringify(zapRequest));
+  let url = `${lnurlData.callback}${lnurlData.callback.includes('?') ? '&' : '?'}amount=${amountMsats}`;
+  if (lnurlData.allowsNostr && lnurlData.nostrPubkey) {
+    url += `&nostr=${encoded}`;
+  }
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Invoice request failed (${res.status})`);
+  const data = await res.json();
+  if (data.status === 'ERROR') throw new Error(data.reason || 'Invoice request error');
+  if (!data.pr) throw new Error('No invoice returned');
+  return data.pr;
+}
+
+function zapShowStep(step) {
+  ['form', 'loading', 'invoice', 'success', 'error'].forEach(s => {
+    const el = document.getElementById(`zap-step-${s}`);
+    if (el) el.style.display = s === step ? '' : 'none';
+  });
+}
+
+function openZapModal(recipientPubkey, lud16, eventId, recipientName, recipientAvatar) {
+  zapState = { recipientPubkey, lud16, eventId, recipientName: recipientName || '', recipientAvatar: recipientAvatar || '', bolt11: null };
+
+  // Reset form
+  zapShowStep('form');
+  document.querySelectorAll('.zap-amt').forEach(b => b.classList.toggle('active', b.dataset.amount === '100'));
+  document.getElementById('zap-custom').value = '';
+  document.getElementById('zap-message').value = '';
+  document.getElementById('zap-char-count').textContent = '0 / 280';
+  document.getElementById('zap-char-count').classList.remove('near-limit');
+
+  // Set recipient info
+  const avatarEl = document.getElementById('zap-recipient-avatar');
+  if (recipientAvatar) {
+    avatarEl.src = recipientAvatar;
+    avatarEl.style.display = '';
+  } else {
+    avatarEl.style.display = 'none';
+  }
+  document.getElementById('zap-recipient-name').textContent = recipientName || 'Anonymous';
+
+  // Show overlay
+  const overlay = document.getElementById('zap-overlay');
+  overlay.classList.remove('hidden', 'fade-out');
+}
+
+function closeZapModal() {
+  closeZapSub();
+  const overlay = document.getElementById('zap-overlay');
+  overlay.classList.add('fade-out');
+  setTimeout(() => overlay.classList.add('hidden'), 150);
+}
+
+function listenForZapReceipt(recipientPubkey, eventId) {
+  closeZapSub();
+  const filter = { kinds: [9735], '#p': [recipientPubkey], limit: 1, since: Math.floor(Date.now() / 1000) - 5 };
+  if (eventId) filter['#e'] = [eventId];
+  zapState.zapSub = pool.subscribeMany(DEFAULT_RELAYS, [filter], {
+    onevent(e) {
+      // Verify the bolt11 in the receipt description matches ours
+      const descTag = e.tags.find(t => t[0] === 'description');
+      if (descTag) {
+        try {
+          const req = JSON.parse(descTag[1]);
+          const reqBolt = e.tags.find(t => t[0] === 'bolt11');
+          if (reqBolt && reqBolt[1] === zapState.bolt11) {
+            onZapConfirmed();
+            return;
+          }
+          // Also match by amount as fallback
+          const amtTag = req.tags?.find(t => t[0] === 'amount');
+          if (amtTag) {
+            onZapConfirmed();
+            return;
+          }
+        } catch {}
+      }
+      // Any kind 9735 matching our filter is likely our zap
+      onZapConfirmed();
+    }
+  });
+
+  // Timeout after 10 minutes
+  setTimeout(closeZapSub, 600000);
+}
+
+function onZapConfirmed() {
+  closeZapSub();
+  zapShowStep('success');
+  setTimeout(closeZapModal, 3000);
+}
+
+function getSelectedAmount() {
+  const customVal = document.getElementById('zap-custom').value.trim();
+  if (customVal && parseInt(customVal) > 0) return parseInt(customVal);
+  const active = document.querySelector('.zap-amt.active');
+  return active ? parseInt(active.dataset.amount) : 100;
+}
+
+async function handleZapSend() {
+  const amount = getSelectedAmount();
+  let message = document.getElementById('zap-message').value.trim();
+
+  // Format message
+  if (!message) {
+    message = 'Sent via NostrGate';
+  } else if (message.length + ' | Sent via NostrGate'.length <= 280) {
+    message += ' | Sent via NostrGate';
+  }
+
+  zapShowStep('loading');
+
+  try {
+    const lnurlData = await fetchLnurlPayEndpoint(zapState.lud16);
+
+    const msats = amount * 1000;
+    if (lnurlData.minSendable && msats < lnurlData.minSendable) {
+      throw new Error(`Minimum amount is ${Math.ceil(lnurlData.minSendable / 1000)} sats`);
+    }
+    if (lnurlData.maxSendable && msats > lnurlData.maxSendable) {
+      throw new Error(`Maximum amount is ${Math.floor(lnurlData.maxSendable / 1000)} sats`);
+    }
+
+    const { sk, pk } = generateZapKeypair();
+    publishNostrGateProfile(sk, pk); // fire & forget
+
+    const zapReq = createZapRequest(zapState.recipientPubkey, zapState.eventId, amount, message, sk, pk);
+    const bolt11 = await requestInvoice(lnurlData, zapReq, msats);
+    zapState.bolt11 = bolt11;
+
+    // Generate QR
+    const qrDataUrl = await QRCode.toDataURL(bolt11.toUpperCase(), { width: 480, margin: 0, color: { dark: '#000', light: '#fff' } });
+    document.getElementById('zap-qr-img').src = qrDataUrl;
+
+    // Set amount display
+    document.getElementById('zap-invoice-sats').textContent = amount.toLocaleString();
+
+    // Set Open in App href
+    document.getElementById('zap-open-app').href = `lightning:${bolt11}`;
+
+    zapShowStep('invoice');
+
+    // Listen for zap receipt (kind 9735)
+    listenForZapReceipt(zapState.recipientPubkey, zapState.eventId);
+  } catch (err) {
+    document.getElementById('zap-error-msg').textContent = err.message || 'Something went wrong';
+    zapShowStep('error');
+  }
+}
+
+async function init() {
+  document.getElementById('logo-btn').addEventListener('click', goHome);
+  document.getElementById('error-back').addEventListener('click', goHome);
+
+  const homeInput = document.getElementById('home-input');
+  document.getElementById('home-btn').addEventListener('click', () => { const v=homeInput.value.trim(); if(v) navigate(v); });
+  homeInput.addEventListener('keydown', e => { if(e.key==='Enter'){const v=homeInput.value.trim();if(v)navigate(v);} });
+
+  const headerInput = document.getElementById('header-input');
+  document.getElementById('header-btn').addEventListener('click', () => { const v=headerInput.value.trim(); if(v) navigate(v); });
+  headerInput.addEventListener('keydown', e => { if(e.key==='Enter'){const v=headerInput.value.trim();if(v)navigate(v);} });
+
+  // About page button
+  document.getElementById('footer-about-btn').addEventListener('click', goAbout);
+  document.getElementById('footer-logo-btn').addEventListener('click', goHome);
+  document.getElementById('about-try-btn').addEventListener('click', goHome);
+
+  // About page identifier cards - accordion search drawer
+  const drawerEl    = document.getElementById('about-id-drawer');
+  const drawerLabel = document.getElementById('about-drawer-label');
+  const drawerInput = document.getElementById('about-drawer-input');
+  const drawerBtn   = document.getElementById('about-drawer-btn');
+  let activeCard    = null;
+
+  document.querySelectorAll('.about-id-card[data-label]').forEach(card => {
+    card.addEventListener('click', () => {
+      const grid = document.getElementById('about-ids-grid');
+
+      // Clicking active card closes it
+      if (activeCard === card) {
+        card.classList.remove('active');
+        drawerEl.classList.remove('open');
+        activeCard = null;
+        const section = document.querySelector('.about-ids');
+        section.style.paddingBottom = '';
+        return;
+      }
+
+      // Deactivate previous
+      if (activeCard) activeCard.classList.remove('active');
+      card.classList.add('active');
+      activeCard = card;
+
+      // Update drawer content
+      drawerLabel.textContent = card.dataset.label;
+      drawerInput.placeholder = card.dataset.placeholder;
+      drawerInput.value = '';
+
+      // Always place drawer after the last card
+      const cards = [...grid.querySelectorAll('.about-id-card[data-label]')];
+      const lastCard = cards[cards.length - 1];
+      lastCard.after(drawerEl);
+
+      // Measure current section padding-bottom
+      const section = document.querySelector('.about-ids');
+      const basePb  = 80; // 5rem in px approx
+
+      // Hide drawer briefly to measure its natural height
+      drawerEl.style.visibility = 'hidden';
+      drawerEl.classList.remove('open');
+      drawerEl.classList.add('open');
+      const drawerH = drawerEl.offsetHeight;
+      drawerEl.style.visibility = '';
+
+      // Expand section smoothly to accommodate drawer
+      section.style.paddingBottom = (basePb + drawerH) + 'px';
+
+      // Trigger drawer animation
+      drawerEl.classList.remove('open');
+      void drawerEl.offsetWidth;
+      drawerEl.classList.add('open');
+
+      // Focus input
+      setTimeout(() => drawerInput.focus(), 50);
+    });
+  });
+
+  // Drawer open button
+  drawerBtn.addEventListener('click', () => {
+    const val = drawerInput.value.trim();
+    if (val) navigate(val);
+  });
+  drawerInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { const val = drawerInput.value.trim(); if (val) navigate(val); }
+  });
+
+  // Show "NostrGate built by" on third-party hosts
+  if (!location.hostname.endsWith('nostrgate.com')) {
+    const builtBy = document.getElementById('footer-built-by');
+    if (builtBy) builtBy.innerHTML = `<a href="https://nostrgate.com" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">NostrGate</a> built by <a href="#" data-entity="npub1x5t34kxd79m657qcuwp4zrypy9t8t4e6yks5zapjvau29t0xvgaqakh2p2" class="footer-nostr-link">5t34k</a>`;
+  }
+
+  // Footer nostr profile links (after innerHTML replacement so new elements are wired)
+  document.querySelectorAll('a.footer-nostr-link[data-entity]').forEach(el => {
+    el.addEventListener('click', e => { e.preventDefault(); navigate(el.dataset.entity); });
+  });
+
+  // -- Zap modal wiring --
+  const zapOverlay = document.getElementById('zap-overlay');
+  document.getElementById('zap-close').addEventListener('click', closeZapModal);
+  zapOverlay.addEventListener('click', e => { if (e.target === zapOverlay) closeZapModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !zapOverlay.classList.contains('hidden')) closeZapModal(); });
+
+  // Amount pill selection
+  document.getElementById('zap-amounts').addEventListener('click', e => {
+    const btn = e.target.closest('.zap-amt');
+    if (!btn) return;
+    document.querySelectorAll('.zap-amt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('zap-custom').value = '';
+  });
+
+  // Custom amount input
+  document.getElementById('zap-custom').addEventListener('input', () => {
+    document.querySelectorAll('.zap-amt').forEach(b => b.classList.remove('active'));
+  });
+
+  // Message character counter
+  document.getElementById('zap-message').addEventListener('input', e => {
+    const len = e.target.value.length;
+    const counter = document.getElementById('zap-char-count');
+    counter.textContent = `${len} / 280`;
+    counter.classList.toggle('near-limit', len > 240);
+  });
+
+  // Send zap
+  document.getElementById('zap-send').addEventListener('click', handleZapSend);
+
+  // Copy invoice
+  document.getElementById('zap-copy').addEventListener('click', () => {
+    if (!zapState.bolt11) return;
+    navigator.clipboard.writeText(zapState.bolt11).then(() => {
+      const btn = document.getElementById('zap-copy');
+      const orig = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      btn.style.color = 'var(--accent)';
+      setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 2000);
+    });
+  });
+
+  // Retry on error
+  document.getElementById('zap-retry').addEventListener('click', () => {
+    zapShowStep('form');
+  });
+
+  // Load IndexedDB cache before first navigation
+  try { db = await openDB(); await loadCacheFromDB(); } catch {}
+
+  // Initial route
+  if (isAboutURL()) { showView('about'); prefetchFooterProfiles(); }
+  else {
+    const entity = getEntityFromURL();
+    if (entity) loadEntity(entity);
+    else { showView('home'); prefetchFooterProfiles(); }
+  }
+}
+
+window.addEventListener('popstate', () => {
+  if (isAboutURL()) { window.scrollTo({top:0,behavior:'instant'}); showView('about'); prefetchFooterProfiles(); }
+  else {
+    const entity = getEntityFromURL();
+    if (entity) loadEntity(entity);
+    else { window.scrollTo({top:0,behavior:'instant'}); showView('home'); prefetchFooterProfiles(); }
+  }
+});
+
+init();
+</script>
+
+<!-- ZAP MODAL -->
+<div class="zap-overlay hidden" id="zap-overlay">
+  <div class="zap-modal">
+    <button class="zap-close" id="zap-close">&times;</button>
+    <div class="zap-eyebrow">// ZAP</div>
+    <div class="zap-title">SEND SATS</div>
+    <div class="zap-recipient" id="zap-recipient">
+      <img class="zap-recipient-avatar" id="zap-recipient-avatar" src="" alt="" onerror="this.style.display='none'">
+      <span id="zap-recipient-name"></span>
+    </div>
+
+    <!-- Step 1: Amount form -->
+    <div id="zap-step-form">
+      <div class="zap-amounts" id="zap-amounts">
+        <button class="zap-amt" data-amount="10">10</button>
+        <button class="zap-amt" data-amount="50">50</button>
+        <button class="zap-amt active" data-amount="100">100</button>
+        <button class="zap-amt" data-amount="500">500</button>
+        <button class="zap-amt" data-amount="1000">1K</button>
+      </div>
+      <input class="zap-custom-input" id="zap-custom" type="number" min="1" placeholder="Custom amount" autocomplete="off">
+      <textarea class="zap-message" id="zap-message" rows="2" placeholder="Add a message (optional)" maxlength="280"></textarea>
+      <div class="zap-msg-footer">
+        <span class="zap-char-count" id="zap-char-count">0 / 280</span>
+      </div>
+      <button class="zap-send" id="zap-send">ZAP</button>
+    </div>
+
+    <!-- Loading -->
+    <div id="zap-step-loading" style="display:none">
+      <div class="zap-loading">
+        <span class="gate-loader gate-loader-md"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span>
+        <div class="zap-loading-text">Requesting invoice…</div>
+      </div>
+    </div>
+
+    <!-- Step 2: Invoice -->
+    <div id="zap-step-invoice" style="display:none" class="zap-step-invoice">
+      <div class="zap-invoice-amount" id="zap-invoice-amount"><span id="zap-invoice-sats"></span> sats</div>
+      <div class="zap-qr-wrap" id="zap-qr-wrap">
+        <img id="zap-qr-img" src="" alt="QR Code">
+      </div>
+      <div class="zap-invoice-actions">
+        <button class="client-btn" id="zap-copy">Copy Invoice</button>
+        <a class="client-btn primary" id="zap-open-app" href="#">Open in App</a>
+      </div>
+      <div class="zap-waiting"><span class="zap-waiting-dot"></span> Waiting for payment…</div>
+    </div>
+
+    <!-- Success -->
+    <div id="zap-step-success" style="display:none">
+      <div class="zap-success">
+        <div class="zap-success-check">✓</div>
+        <div class="zap-success-text">Zap sent!</div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div id="zap-step-error" style="display:none">
+      <div class="zap-error">
+        <div class="zap-error-msg" id="zap-error-msg"></div>
+        <button class="zap-retry" id="zap-retry">Try again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-logo" id="footer-logo-btn" style="cursor:pointer"><span>NOSTR</span>GATE</div>
+      <div class="footer-tagline">// Step into the open web</div>
+    </div>
+    <div class="footer-links">
+      <button class="footer-btn primary" id="footer-about-btn">About</button>
+      <div class="footer-sep"></div>
+      <a class="footer-btn" href="https://github.com/5t34k/nostrgate" target="_blank" rel="noopener" id="footer-github-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub
+      </a>
+    </div>
+    <div class="footer-credit">
+      <span>Built on <a href="https://github.com/nostr-protocol/nostr" target="_blank" rel="noopener">Nostr</a></span>
+      <span>Powered by <a href="https://github.com/nbd-wtf/nostr-tools" target="_blank" rel="noopener">nostr-tools</a></span>
+      <span>Inspired by <a href="https://njump.me" target="_blank" rel="noopener">njump</a> by <a href="#" data-entity="npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6" class="footer-nostr-link">fiatjaf</a></span>
+      <span id="footer-built-by">Built by <a href="#" data-entity="npub1x5t34kxd79m657qcuwp4zrypy9t8t4e6yks5zapjvau29t0xvgaqakh2p2" class="footer-nostr-link">5t34k</a></span>
+      <span style="margin-left:auto;color:var(--muted2)">The open web awaits.</span>
+    </div>
+  </div>
+</footer>
+
+
+</body>
+</html>
