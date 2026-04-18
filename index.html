@@ -32,6 +32,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Security posture -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-dVyJ+DA7oNDAe8KEMl68ZtM+kb4jCBDhRdBj3UfYWVg=' 'strict-dynamic' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src https: blob:; connect-src 'self' https: wss:; frame-src https://www.youtube-nocookie.com; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests; require-trusted-types-for 'script'; trusted-types dompurify default">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Permissions-Policy" content="accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+
   <title>NostrGate - A window into the open web</title>
   <meta name="description" content="View profiles, posts, articles and live streams from the decentralized Nostr network. No account needed.">
 
@@ -50,7 +56,20 @@
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+
+  <!-- Pinned module dependencies (SRI over the raw response bytes) -->
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.es.mjs"
+        integrity="sha384-JxOUkYRCoiIG94CKC+8Vhd2WkdScHfsrWOcbmRzQ/gAauZFTt6+vDdmyse6OCYCx" crossorigin="anonymous">
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/marked@14.0.0/lib/marked.esm.js"
+        integrity="sha384-8YwUZ1NGFVS9BKEU/29eoR6AOPCxJl/Obw6+DjpkultrqEQH1pb4F5tU3n1XMWHd" crossorigin="anonymous">
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.mjs"
+        integrity="sha384-zSHUU8S7fxFFC6D08FBLVUQAqteduMmRWUKuhvs5QOUh41khg2pwii1o+qga9Zg6" crossorigin="anonymous">
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/nostr-tools@2.10.4/+esm"
+        integrity="sha384-scubVgml2Do6sRkdcPzyuwkLbgleWWk8ZefneCj5B+cZZFonf0m91chvRpUvi0QH" crossorigin="anonymous">
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm"
+        integrity="sha384-VHGJgqrZwxQP1y+A8DyBcjoGeQ46AOLn0E058y9SVVTVh8r/W1H0eE8jEZcebiFb" crossorigin="anonymous">
   <style>
     :root {
       --bg: #0a0a0a;
@@ -2487,6 +2506,14 @@
       .zap-invoice-actions { flex-wrap: wrap; }
       .zap-invoice-actions .client-btn { flex: 1 1 100%; }
     }
+
+    /* -- Utility classes (used in place of inline style= in dynamic templates) -- */
+    .u-text-inherit    { text-decoration: none; color: inherit; }
+    .u-accent-link     { color: var(--accent); text-decoration: none; }
+    .u-avatar-xs       { width: 18px; height: 18px; border-radius: 3px; object-fit: cover; margin-right: 4px; }
+    .u-hidden          { display: none; }
+    .u-mt-small        { margin-top: 0.6rem; }
+    .u-mb-2            { margin-bottom: 2rem; }
   </style>
 </head>
 <body>
@@ -2689,7 +2716,7 @@
     <h2>READY TO<br><span>EXPLORE?</span></h2>
     <div class="about-cta-btns">
       <button class="btn-about-primary" id="about-try-btn">Try it now →</button>
-      <a class="btn-about-secondary" href="https://github.com" target="_blank" rel="noopener" id="about-github-btn">
+      <a class="btn-about-secondary" href="https://github.com" target="_blank" rel="noopener noreferrer" id="about-github-btn">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
         View Source
       </a>
@@ -2704,28 +2731,44 @@
 </div>
 
 <script type="module">
-import { nip19, finalizeEvent, generateSecretKey, getPublicKey } from 'https://esm.sh/nostr-tools@2.10.4';
-import { SimplePool } from 'https://esm.sh/nostr-tools@2.10.4/pool';
-import Hls from 'https://esm.sh/hls.js@1.5.15';
-import QRCode from 'https://esm.sh/qrcode@1.5.4/lib/browser';
-import { marked } from 'https://esm.sh/marked@14.0.0';
+// Dependencies are pinned to jsdelivr with Subresource Integrity (see <link rel="modulepreload"> in <head>).
+// To upgrade: bump the @version below AND in the modulepreload tag, then regenerate the SRI hash:
+//   curl -sL <url> | openssl dgst -sha384 -binary | openssl base64 -A
+import { nip19, finalizeEvent, generateSecretKey, getPublicKey, SimplePool, verifyEvent } from 'https://cdn.jsdelivr.net/npm/nostr-tools@2.10.4/+esm';
+import Hls from 'https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.mjs';
+import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm';
+import { marked } from 'https://cdn.jsdelivr.net/npm/marked@14.0.0/lib/marked.esm.js';
+import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.es.mjs';
 
 const pool = new SimplePool();
+
+// Defense-in-depth: SimplePool in nostr-tools 2.x already verifies signatures internally before
+// events reach onevent. We deliberately do NOT re-wrap subscribeMany — prior attempts broke the
+// subscription flow when verifyEvent was called on events that lack the internal verifiedSymbol
+// linkage across bundle boundaries. If pool verification is ever disabled, restore a wrapper
+// that tolerates throws (try/catch) and avoids mutating pool methods.
 
 const NOSTRGATE_ICON = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIj4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIGZpbGw9IiMwYTBhMGEiIHJ4PSI1Ii8+CiAgPHBvbHlnb24gcG9pbnRzPSIxNiwyIDI4LDkgMjgsMjMgMTYsMzAgNCwyMyA0LDkiIGZpbGw9IiNlOGZmNDciLz4KICA8cG9seWdvbiBwb2ludHM9IjE5LDUgMTEsMTggMTYsMTggMTMsMjcgMjEsMTQgMTYsMTQiIGZpbGw9IiMwYTBhMGEiLz4KICA8Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxLjgiIGZpbGw9IiNlOGZmNDciLz4KPC9zdmc+';
 
 // -- IndexedDB persistence --
 let db = null;
 
+// IndexedDB v2: wipes pre-hardening event/addrEvent caches on first load after upgrade.
+// v1 stored raw event payloads (not pre-rendered HTML), so purging is precautionary, not required
+// for correctness — but it leaves no cross-version residue.
 function openDB() {
   return new Promise(resolve => {
     try {
-      const req = indexedDB.open('nostrgate', 1);
+      const req = indexedDB.open('nostrgate', 2);
       req.onupgradeneeded = e => {
         const d = e.target.result;
-        if (!d.objectStoreNames.contains('events')) d.createObjectStore('events', { keyPath: 'id' });
-        if (!d.objectStoreNames.contains('profiles')) d.createObjectStore('profiles');
-        if (!d.objectStoreNames.contains('addrEvents')) d.createObjectStore('addrEvents');
+        // Clear any previously-cached events from v1 so untrusted payloads cached without verification are dropped.
+        if (d.objectStoreNames.contains('events')) d.deleteObjectStore('events');
+        if (d.objectStoreNames.contains('addrEvents')) d.deleteObjectStore('addrEvents');
+        if (d.objectStoreNames.contains('profiles')) d.deleteObjectStore('profiles');
+        d.createObjectStore('events', { keyPath: 'id' });
+        d.createObjectStore('profiles');
+        d.createObjectStore('addrEvents');
         if (!d.objectStoreNames.contains('feedState')) d.createObjectStore('feedState');
         if (!d.objectStoreNames.contains('nip05')) d.createObjectStore('nip05');
       };
@@ -2740,6 +2783,14 @@ function dbPut(store, value, key) {
   try {
     const tx = db.transaction(store, 'readwrite');
     tx.objectStore(store).put(value, key);
+  } catch {}
+}
+
+function dbDelete(store, key) {
+  if (!db) return;
+  try {
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).delete(key);
   } catch {}
 }
 
@@ -2776,14 +2827,38 @@ async function loadCacheFromDB() {
 }
 
 // -- Write-through cache helpers --
+// Per-store caps stop a malicious relay from filling browser storage with oversized junk.
+const CACHE_CAPS = { events: 2000, profiles: 5000, addrEvents: 1000 };
+const MAX_EVENT_BYTES = 64 * 1024; // drop pathologically large events before caching
+
+function boundMap(store, cacheMap, cap) {
+  if (cacheMap.size <= cap) return;
+  // Evict oldest-inserted (Map iteration is insertion order) until back to cap-200.
+  const iter = cacheMap.keys();
+  const evictCount = cacheMap.size - cap + 200;
+  for (let i = 0; i < evictCount; i++) {
+    const k = iter.next().value;
+    if (k === undefined) break;
+    cacheMap.delete(k);
+    dbDelete(store, k);
+  }
+}
+
 function cacheEvent(e) {
+  try {
+    if (!e || typeof e !== 'object' || !e.id) return;
+    const approxSize = (e.content?.length || 0) + JSON.stringify(e.tags || []).length;
+    if (approxSize > MAX_EVENT_BYTES) return;
+  } catch { return; }
   cache.events.set(e.id, e);
   dbPut('events', e);
+  boundMap('events', cache.events, CACHE_CAPS.events);
 }
 
 function cacheProfile(pubkey, meta) {
   cache.profiles.set(pubkey, meta);
   dbPut('profiles', meta, pubkey);
+  boundMap('profiles', cache.profiles, CACHE_CAPS.profiles);
 }
 
 function cacheNip05(key, value) {
@@ -2794,6 +2869,7 @@ function cacheNip05(key, value) {
 function cacheAddrEvent(cacheKey, e) {
   cache.addrEvents.set(cacheKey, e);
   dbPut('addrEvents', e, cacheKey);
+  boundMap('addrEvents', cache.addrEvents, CACHE_CAPS.addrEvents);
 }
 
 function cacheFeedState(pubkey, state) {
@@ -2813,7 +2889,6 @@ const cache = {
 
 const DEFAULT_RELAYS = [
   'wss://relay.damus.io',
-  'wss://relay.nostr.band',
   'wss://nos.lol',
   'wss://nostr.wine',
   'wss://relay.primal.net',
@@ -2892,10 +2967,14 @@ const CLIENTS = {
 
 // -- Routing --
 function getEntityFromURL() {
-  const hash = location.hash.slice(1);
+  const hash = decodeURIComponent(location.hash.slice(1) || '');
   if (hash === 'about') return '';   // reserved for the about page
   const search = new URLSearchParams(location.search);
-  return hash || search.get('e') || search.get('entity') || '';
+  const raw = (hash || search.get('e') || search.get('entity') || '').trim();
+  // Belt-and-braces allowlist: only characters valid in bech32 / hex / NIP-05.
+  // `decodeEntity` still enforces the real validation; this rejects obvious junk before it reaches any sink.
+  if (raw && !/^[A-Za-z0-9@._:+\-]{1,512}$/.test(raw)) return '';
+  return raw;
 }
 
 function isAboutURL() {
@@ -2952,13 +3031,21 @@ function decodeEntity(raw) {
   }
 }
 
+// NIP-05 local-part and domain format validation. Rejects attacker-controlled strings
+// (control chars, slashes, spaces, extra @'s) before we let them reach fetch().
+const NIP05_NAME_RE   = /^[a-z0-9_.\-+]+$/i;
+const NIP05_DOMAIN_RE = /^(?:[a-z0-9](?:[a-z0-9\-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/i;
+
 // -- NIP-05 lookup --
 async function fetchNip05Pubkey(identifier) {
   // identifier is canonical form: name@domain  or  _@domain
-  const [name, domain] = identifier.split('@');
+  if (typeof identifier !== 'string' || !identifier.includes('@')) return null;
+  const [name, domain, extra] = identifier.split('@');
+  if (extra !== undefined) return null;
+  if (!NIP05_NAME_RE.test(name) || !NIP05_DOMAIN_RE.test(domain)) return null;
   const url = `https://${domain}/.well-known/nostr.json?name=${encodeURIComponent(name)}`;
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { redirect: 'error', referrerPolicy: 'no-referrer' });
     if (!res.ok) return null;
     const json = await res.json();
     return json?.names?.[name] || null;
@@ -3225,9 +3312,12 @@ function renderContent(text, mentionProfiles = {}) {
           html += `<a class="nostr-mention" href="#${esc(ref)}" data-entity="${esc(ref)}">@${esc(name)}</a>${esc(trailing)}`;
           continue;
         } else if (decoded.type === 'note' || decoded.type === 'nevent' || decoded.type === 'naddr') {
+          // Emit a spinner marker rather than inline SVG; hydrateSpinners() replaces markers with
+          // DOM-built loader nodes after innerHTML insertion so DOMPurify's SVG round-trip can't
+          // break the animation.
           html += `<div class="quote-ref" data-entity="${esc(ref)}">
             <div class="quote-loading">
-              <span class="quote-spinner"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span> Loading quoted note…
+              <span class="ng-spinner ng-spinner-sm"></span> Loading quoted note…
             </div>
           </div>${esc(trailing)}`;
           continue;
@@ -3238,31 +3328,36 @@ function renderContent(text, mentionProfiles = {}) {
       continue;
     }
 
-    // Regular URLs
+    // Regular URLs — every branch re-validates the scheme.
     if (/^https?:\/\//i.test(trimmed)) {
+      const safe = safeHttpUrl(trimmed);
+      if (!safe) { html += esc(token); continue; }
       // Image
-      if (IMAGE_EXTS.test(trimmed)) {
-        html += `<div class="media-block"><img class="inline-img" src="${esc(trimmed)}" alt="image" loading="lazy" onerror="this.parentElement.remove()"></div>`;
+      if (IMAGE_EXTS.test(safe)) {
+        html += `<div class="media-block">${safeImg(safe, { className: 'inline-img', alt: 'image', onErrorBehavior: 'remove-parent' })}</div>`;
         continue;
       }
       // Video
-      if (VIDEO_EXTS.test(trimmed)) {
-        html += `<div class="media-block"><video class="inline-video" controls preload="metadata" src="${esc(trimmed)}" onerror="this.parentElement.remove()"></video></div>`;
+      if (VIDEO_EXTS.test(safe)) {
+        html += `<div class="media-block"><video class="inline-video" controls preload="metadata" src="${esc(safe)}" data-on-error="remove-parent"></video></div>`;
         continue;
       }
       // Audio
-      if (AUDIO_EXTS.test(trimmed)) {
-        html += `<div class="media-block"><audio class="inline-audio" controls src="${esc(trimmed)}" onerror="this.parentElement.remove()"></audio></div>`;
+      if (AUDIO_EXTS.test(safe)) {
+        html += `<div class="media-block"><audio class="inline-audio" controls src="${esc(safe)}" data-on-error="remove-parent"></audio></div>`;
         continue;
       }
-      // YouTube
-      const ytMatch = trimmed.match(YOUTUBE_RE);
+      // YouTube (pinned id, nocookie, sandboxed)
+      const ytMatch = safe.match(YOUTUBE_RE);
       if (ytMatch) {
-        html += `<div class="media-block media-embed"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allowfullscreen loading="lazy"></iframe></div>`;
-        continue;
+        const embedUrl = youtubeEmbedUrl(ytMatch[1]);
+        if (embedUrl) {
+          html += `<div class="media-block media-embed"><iframe src="${esc(embedUrl)}" sandbox="allow-scripts allow-same-origin allow-presentation" allow="encrypted-media; picture-in-picture; fullscreen" referrerpolicy="no-referrer" loading="lazy"></iframe></div>`;
+          continue;
+        }
       }
       // Regular link
-      html += `<a class="inline-link" href="${esc(trimmed)}" target="_blank" rel="noopener">${esc(trimmed)}</a>`;
+      html += anchor(safe, esc(safe), { className: 'inline-link' });
       continue;
     }
 
@@ -3289,24 +3384,34 @@ function renderContent(text, mentionProfiles = {}) {
 
 // -- Lightweight preview renderer for quote card text --
 function renderQuotePreview(text, profiles = {}) {
-  // Strip nostr:note/nevent/naddr references (don't nest quotes)
+  // Strip nested note/nevent/naddr references so quote cards don't recurse
   let cleaned = text.replace(/nostr:(note1|nevent1|naddr1)[a-z0-9]+/g, '');
-  // Truncate
   if (cleaned.length > 280) cleaned = cleaned.slice(0, 280) + '…';
-  // Escape first
-  let html = esc(cleaned);
-  // Linkify URLs
-  html = html.replace(/(https?:\/\/[^\s<]+)/g, '<a class="inline-link" href="$1" target="_blank" rel="noopener">$1</a>');
-  // Resolve nostr:npub/nprofile mentions
-  html = html.replace(/nostr:(npub1[a-z0-9]+|nprofile1[a-z0-9]+)/g, (match, ref) => {
-    try {
-      const decoded = nip19.decode(ref);
-      const pk = decoded.type === 'npub' ? decoded.data : decoded.data?.pubkey;
-      const meta = profiles[pk];
-      const name = displayName(meta, pk);
-      return `<a class="nostr-mention" href="#${esc(ref)}" data-entity="${esc(ref)}">@${esc(name)}</a>`;
-    } catch { return match; }
-  });
+  // Tokenize in one pass on the raw (un-escaped) text so URLs can pass safeHttpUrl intact,
+  // and escape every non-token run. This avoids the "&amp; already in URL" double-escape trap.
+  const tokenRe = /(https?:\/\/[^\s<>"']+|nostr:(?:npub1|nprofile1)[a-z0-9]+)/g;
+  let html = '';
+  let last = 0;
+  let m;
+  while ((m = tokenRe.exec(cleaned)) !== null) {
+    html += esc(cleaned.slice(last, m.index));
+    const tok = m[0];
+    if (tok.startsWith('nostr:')) {
+      const ref = tok.slice(6);
+      try {
+        const decoded = nip19.decode(ref);
+        const pk = decoded.type === 'npub' ? decoded.data : decoded.data?.pubkey;
+        const meta = profiles[pk];
+        const name = displayName(meta, pk);
+        html += `<a class="nostr-mention" href="#${esc(ref)}" data-entity="${esc(ref)}">@${esc(name)}</a>`;
+      } catch { html += esc(tok); }
+    } else {
+      const safe = safeHttpUrl(tok);
+      html += safe ? anchor(safe, esc(safe), { className: 'inline-link' }) : esc(tok);
+    }
+    last = m.index + m[0].length;
+  }
+  html += esc(cleaned.slice(last));
   html = html.replace(/(^|\s)(#[a-zA-Z]\w{0,49})(?=[\s,.:;!?]|$)/g, '$1<span class="hashtag">$2</span>');
   return html;
 }
@@ -3355,21 +3460,22 @@ async function resolveQuotes(container) {
       if (decoded.type === 'naddr') return; // handled separately below
       const id = decoded.type === 'note' ? decoded.data : decoded.data?.id;
       const event = events.find(e => e.id === id);
-      if (!event) { el.innerHTML = `<div class="quote-missing">Quoted note not found</div>`; return; }
+      if (!event) { el.innerHTML = `<div class="quote-missing">Quoted note not found</div>`; wireMediaHandlers(el); return; }
       const meta = profiles[event.pubkey];
       const name = displayName(meta, event.pubkey);
       const avatar = meta?.picture || '';
       const ts = new Date(event.created_at * 1000);
       const raw = nip19.noteEncode(event.id);
-      el.innerHTML = `
+      el.innerHTML = sanitize(`
         <div class="quote-card" data-entity="${esc(raw)}">
           <div class="quote-author">
-            ${avatar ? `<img class="quote-avatar" src="${esc(avatar)}" onerror="this.style.display='none'">` : ''}
+            ${safeImg(avatar, { className: 'quote-avatar', alt: '' })}
             <span class="quote-name">${esc(name)}</span>
             <span class="quote-time">${formatDate(ts)}</span>
           </div>
           <div class="quote-text">${renderQuotePreview(event.content, profiles)}</div>
-        </div>`;
+        </div>`, 'quote');
+      wireMediaHandlers(el);
       el.querySelector('.quote-card').addEventListener('click', () => navigate(raw));
     } catch {}
   });
@@ -3379,7 +3485,7 @@ async function resolveQuotes(container) {
     try {
       const d = decoded.data;
       const event = addrEvents.find(e => e.pubkey === d.pubkey && e.kind === d.kind && e.tags.some(t => t[0] === 'd' && t[1] === d.identifier));
-      if (!event) { el.innerHTML = `<div class="quote-missing">Quoted content not found</div>`; continue; }
+      if (!event) { el.innerHTML = `<div class="quote-missing">Quoted content not found</div>`; wireMediaHandlers(el); continue; }
       const meta = profiles[event.pubkey];
       const name = displayName(meta, event.pubkey);
       const avatar = meta?.picture || '';
@@ -3388,15 +3494,16 @@ async function resolveQuotes(container) {
       // For articles (kind 30023), show title if available
       const title = event.tags.find(t => t[0] === 'title')?.[1];
       const previewText = title ? esc(title) : renderQuotePreview(event.content, profiles);
-      el.innerHTML = `
+      el.innerHTML = sanitize(`
         <div class="quote-card" data-entity="${esc(entityRef)}">
           <div class="quote-author">
-            ${avatar ? `<img class="quote-avatar" src="${esc(avatar)}" onerror="this.style.display='none'">` : ''}
+            ${safeImg(avatar, { className: 'quote-avatar', alt: '' })}
             <span class="quote-name">${esc(name)}</span>
             <span class="quote-time">${formatDate(ts)}</span>
           </div>
           <div class="quote-text">${previewText}</div>
-        </div>`;
+        </div>`, 'quote');
+      wireMediaHandlers(el);
       el.querySelector('.quote-card').addEventListener('click', () => navigate(entityRef));
     } catch {}
   }
@@ -3517,7 +3624,7 @@ function authorHeader(name, avatar, ts, pubkeyRaw) {
       ${ts ? `<div class="note-timestamp">${formatDate(ts)}</div>` : ''}
     </div>`;
   if (pubkeyRaw) {
-    return `<a class="note-header note-header-link" href="#" data-entity="${esc(pubkeyRaw)}" style="text-decoration:none;color:inherit">${inner}</a>`;
+    return `<a class="note-header note-header-link u-text-inherit" href="#" data-entity="${esc(pubkeyRaw)}">${inner}</a>`;
   }
   return `<div class="note-header">${inner}</div>`;
 }
@@ -3535,11 +3642,11 @@ function noteSidebar(entity, author, authorPubkeyRaw, ts, authorPubkeyHex) {
   const timeStr = d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
 
   const clientBtns = [
-    ...CLIENTS.native.map(c => `<a class="client-btn primary" href="${esc(c.url(entity))}">${esc(c.name)}</a>`),
-    ...CLIENTS.web.map(c => `<a class="client-btn" href="${esc(c.url(entity))}" target="_blank" rel="noopener">${esc(c.name)}</a>`),
+    ...CLIENTS.native.map(c => anchor(c.url(entity), esc(c.name), { className: 'client-btn primary' })),
+    ...CLIENTS.web.map(c => anchor(c.url(entity), esc(c.name), { className: 'client-btn' })),
   ].join('');
   const extraBtns = CLIENTS.extra.filter(c => !c.hideFor).map(c =>
-    `<a class="client-btn" href="${esc(c.url(entity))}" target="_blank" rel="noopener">${esc(c.name)}</a>`
+    anchor(c.url(entity), esc(c.name), { className: 'client-btn' })
   ).join('');
 
   return `
@@ -3710,8 +3817,8 @@ function renderProfile(entity, pubkey, meta) {
 
   ensureEntityWrap();
   const container = document.getElementById('entity-content');
-  container.innerHTML = `
-    ${banner ? `<img class="profile-banner" src="${esc(banner)}" alt="banner" onerror="this.remove()">` : ''}
+  container.innerHTML = sanitize(`
+    ${safeImg(banner, { className: 'profile-banner', alt: 'banner', onErrorBehavior: 'remove' })}
     <div class="profile-header">
       ${avatarHTML(avatar, name, 'profile-avatar', 'profile-avatar-placeholder')}
       <div class="profile-name-block">
@@ -3721,7 +3828,7 @@ function renderProfile(entity, pubkey, meta) {
     </div>
     ${about ? `<div class="profile-about" id="profile-about">${renderBio(about)}</div>` : '<div class="profile-about profile-about-empty">No bio set.</div>'}
     <div class="profile-meta">
-      ${website ? `<span class="meta-item">🌐 <a href="${esc(website)}" target="_blank" rel="noopener" title="Open website">${esc(website.replace(/^https?:\/\//,''))}</a></span>` : ''}
+      ${website && safeHttpUrl(website) ? `<span class="meta-item">🌐 ${anchor(website, esc(website.replace(/^https?:\/\//,'')), { className: 'inline-link', title: 'Open website' })}</span>` : ''}
       ${lud16   ? `<span class="meta-item"><a class="zap-lud16-link" href="#" id="profile-zap-link" title="Click to zap">⚡ ${esc(lud16)}</a></span>` : ''}
     </div>
     <hr class="divider">
@@ -3732,9 +3839,11 @@ function renderProfile(entity, pubkey, meta) {
       <div class="feed-tab active" id="tab-notes">Recent Notes</div>
       <div class="feed-tab" id="tab-replies">Recent Replies</div>
     </div>
-    <div id="profile-feed"><div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div></div>
-  `;
+    <div id="profile-feed"></div>
+  `);
+  showLoader(document.getElementById('profile-feed'), { sizeClass: 'gate-loader-sm', text: 'OPENING THE GATE...' });
   showView('entity');
+  wireMediaHandlers(container);
   verifyNip05Badges(container);
   wireClientMore();
 
@@ -3763,7 +3872,8 @@ function renderProfile(entity, pubkey, meta) {
       if (bioMentions.length) {
         fetchProfilesByPubkeys(bioMentions, DEFAULT_RELAYS).then(bioProfiles => {
           if (!document.getElementById('profile-about')) return;
-          bioEl.innerHTML = renderBio(about, bioProfiles);
+          bioEl.innerHTML = sanitize(renderBio(about, bioProfiles));
+          wireMediaHandlers(bioEl);
           wireNostrLinks(bioEl);
         });
       } else {
@@ -3873,13 +3983,14 @@ function renderProfile(entity, pubkey, meta) {
     if (feed.querySelector('.feed-loading')) feed.innerHTML = '';
     const html = newNotes.map(n => feedNoteCard(n, meta, nip19.noteEncode(n.id), mentionProfiles)).join('');
     const tmp = document.createElement('div');
-    tmp.innerHTML = html;
+    tmp.innerHTML = sanitize(html);
     [...tmp.children].forEach(el => { el.classList.add('feed-card-enter'); feed.appendChild(el); });
     // Add load-more button
     const more = document.createElement('div');
     more.className = 'feed-load-more';
     more.innerHTML = `<button class="btn-load-more" id="notes-load-more">Load more</button>`;
     feed.appendChild(more);
+    wireMediaHandlers(feed);
     wireFeedClicks(feed);
     verifyNip05Badges(feed);
     document.getElementById('notes-load-more').addEventListener('click', loadMoreNotes);
@@ -3892,7 +4003,7 @@ function renderProfile(entity, pubkey, meta) {
     const feed = document.getElementById('profile-feed');
     if (!feed) return;
     if (notesLoaded) return; // already rendered
-    feed.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+    showLoader(feed, { sizeClass: 'gate-loader-sm', text: 'OPENING THE GATE...' });
     const raw = await fetchNotesPage(null);
     const standalone = raw.filter(isStandaloneNote);
     standalone.sort((a,b) => b.created_at - a.created_at);
@@ -3915,7 +4026,7 @@ function renderProfile(entity, pubkey, meta) {
       prefetchedNotes = null;
     } else {
       const loadMoreDiv = btn?.closest('.feed-load-more');
-      if (loadMoreDiv) loadMoreDiv.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+      if (loadMoreDiv) showLoader(loadMoreDiv, { sizeClass: 'gate-loader-sm', text: 'OPENING THE GATE...' });
       const raw = await fetchNotesPage(notesUntil);
       standalone = raw.filter(isStandaloneNote);
       standalone.sort((a,b) => b.created_at - a.created_at);
@@ -3955,12 +4066,13 @@ function renderProfile(entity, pubkey, meta) {
       return replyThreadCard(r, parent, meta, parentMeta, mentionProfiles);
     }).join('');
     const tmp = document.createElement('div');
-    tmp.innerHTML = html;
+    tmp.innerHTML = sanitize(html);
     [...tmp.children].forEach(el => { el.classList.add('feed-card-enter'); feed.appendChild(el); });
     const more = document.createElement('div');
     more.className = 'feed-load-more';
     more.innerHTML = `<button class="btn-load-more" id="replies-load-more">Load more</button>`;
     feed.appendChild(more);
+    wireMediaHandlers(feed);
     wireFeedClicks(feed);
     document.getElementById('replies-load-more').addEventListener('click', loadMoreReplies);
     repliesFeedCache = feed.innerHTML;
@@ -3989,7 +4101,7 @@ function renderProfile(entity, pubkey, meta) {
     const feed = document.getElementById('profile-feed');
     if (!feed) return;
     if (repliesLoaded) return;
-    feed.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+    showLoader(feed, { sizeClass: 'gate-loader-sm', text: 'OPENING THE GATE...' });
     const replies = await fetchRepliesPage(null);
     replies.sort((a,b) => b.created_at - a.created_at);
     allReplies = replies;
@@ -4014,7 +4126,7 @@ function renderProfile(entity, pubkey, meta) {
       prefetchedReplies = null;
     } else {
       const loadMoreDiv = btn?.closest('.feed-load-more');
-      if (loadMoreDiv) loadMoreDiv.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+      if (loadMoreDiv) showLoader(loadMoreDiv, { sizeClass: 'gate-loader-sm', text: 'OPENING THE GATE...' });
       replies = await fetchRepliesPage(repliesUntil);
       replies.sort((a,b) => b.created_at - a.created_at);
       if (replies.length) await hydrateParents(replies);
@@ -4041,12 +4153,13 @@ function renderProfile(entity, pubkey, meta) {
     if (!notesLoaded) {
       renderNotesTab();
     } else if (notesFeedCache) {
-      feed.innerHTML = notesFeedCache;
+      feed.innerHTML = sanitize(notesFeedCache);
+      wireMediaHandlers(feed);
       wireFeedClicks(feed);
       verifyNip05Badges(feed);
       document.getElementById('notes-load-more')?.addEventListener('click', loadMoreNotes);
     } else {
-      feed.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+      showLoader(feed, { sizeClass: 'gate-loader-sm', text: 'OPENING THE GATE...' });
       appendNoteCards(notes);
     }
   });
@@ -4060,12 +4173,13 @@ function renderProfile(entity, pubkey, meta) {
     if (!repliesLoaded) {
       renderRepliesTab();
     } else if (repliesFeedCache) {
-      feed.innerHTML = repliesFeedCache;
+      feed.innerHTML = sanitize(repliesFeedCache);
+      wireMediaHandlers(feed);
       wireFeedClicks(feed);
       verifyNip05Badges(feed);
       document.getElementById('replies-load-more')?.addEventListener('click', loadMoreReplies);
     } else {
-      feed.innerHTML = `<div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span><div class="loading-text">OPENING THE GATE...</div></div>`;
+      showLoader(feed, { sizeClass: 'gate-loader-sm', text: 'OPENING THE GATE...' });
       appendReplyCards(allReplies);
     }
   });
@@ -4088,7 +4202,8 @@ function renderProfile(entity, pubkey, meta) {
     const feedHTML = activeTab === 'notes' ? notesFeedCache : repliesFeedCache;
     if (feedHTML) {
       const feed = document.getElementById('profile-feed');
-      feed.innerHTML = feedHTML;
+      feed.innerHTML = sanitize(feedHTML);
+      wireMediaHandlers(feed);
       wireFeedClicks(feed);
       verifyNip05Badges(feed);
       if (activeTab === 'notes') {
@@ -4142,7 +4257,7 @@ function renderNote(entity, event, author) {
   const relativeTime = timeAgo(ts);
   const fullTime = formatDate(ts);
 
-  container.innerHTML = `
+  container.innerHTML = sanitize(`
     <div class="note-main">
       <a class="note-main-author" href="#" data-entity="${esc(authorNpub)}">
         ${avatarHTML(avatar, name, 'note-main-avatar', 'note-main-avatar-placeholder')}
@@ -4154,14 +4269,16 @@ function renderNote(entity, event, author) {
       </a>
       <div class="note-main-divider"></div>
       <div class="note-card">
-        <div class="note-content" id="note-body"><div class="feed-loading"><span class="gate-loader gate-loader-sm"><svg viewBox="0 0 28 36"><path class="gate-frame" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/><path class="gate-pulse" d="M2 36V6Q2 2 6 2H22Q26 2 26 6V36"/></svg></span></div></div>
+        <div class="note-content" id="note-body"></div>
       </div>
     </div>
     <div class="note-sidebar" id="note-sidebar"></div>
-  `;
+  `);
 
   // Render sidebar
-  document.getElementById('note-sidebar').innerHTML = noteSidebar(entity, author, authorNpub, ts, event.pubkey);
+  document.getElementById('note-sidebar').innerHTML = sanitize(noteSidebar(entity, author, authorNpub, ts, event.pubkey));
+  showLoader(document.getElementById('note-body'), { sizeClass: 'gate-loader-sm' });
+  wireMediaHandlers(container);
 
   // Wire all author/entity links in both main and sidebar
   container.querySelectorAll('[data-entity]').forEach(el => {
@@ -4173,7 +4290,8 @@ function renderNote(entity, event, author) {
   fetchProfilesByPubkeys(mentionedPubkeys, DEFAULT_RELAYS).then(profiles => {
     const body = document.getElementById('note-body');
     if (!body) return;
-    body.innerHTML = renderContent(event.content, profiles);
+    body.innerHTML = sanitize(renderContent(event.content, profiles));
+    wireMediaHandlers(body);
     resolveQuotes(body);
     wireNostrLinks(body);
   });
@@ -4255,8 +4373,8 @@ function renderLiveStream(entity, event, author) {
 
   const metaItems = [
     hostName ? `<div class="live-meta-item">
-      ${hostAvatar ? `<img src="${esc(hostAvatar)}" style="width:18px;height:18px;border-radius:3px;object-fit:cover" onerror="this.style.display='none'" id="live-host-avatar">` : '<span id="live-host-avatar-ph"></span>'}
-      <strong><a href="#" data-entity="${esc(hostNpub)}" style="color:inherit;text-decoration:none" class="live-host-link" id="live-host-name-link">${esc(hostName)}</a></strong>
+      ${hostAvatar ? safeImg(hostAvatar, { className: 'u-avatar-xs', alt: '', id: 'live-host-avatar' }) : '<span id="live-host-avatar-ph"></span>'}
+      <strong><a href="#" data-entity="${esc(hostNpub)}" class="live-host-link u-text-inherit" id="live-host-name-link">${esc(hostName)}</a></strong>
     </div>` : '',
     viewerCount ? `<div class="live-meta-item">👁 <strong>${esc(viewerCount)}</strong> watching</div>` : '',
     totalCount  ? `<div class="live-meta-item">👥 <strong>${esc(totalCount)}</strong> total</div>` : '',
@@ -4267,8 +4385,10 @@ function renderLiveStream(entity, event, author) {
     ? `<div class="live-tags-row">${hashtags.map(t => `<span class="live-tag">#${esc(t)}</span>`).join('')}</div>`
     : '';
 
-  // Build player or fallback block - inserted into DOM first, then wired up after
-  const playerUrl = isLive ? (streaming || recording) : (recording || streaming);
+  // Build player or fallback block - inserted into DOM first, then wired up after.
+  // playerUrl must be http(s); anything else is rejected so video.src never receives a hostile scheme.
+  const rawPlayerUrl = isLive ? (streaming || recording) : (recording || streaming);
+  const playerUrl = rawPlayerUrl ? safeHttpUrl(rawPlayerUrl) : null;
   const isHls = playerUrl && (playerUrl.includes('.m3u8') || playerUrl.includes('hls'));
   const isDirect = playerUrl && VIDEO_EXTS.test(playerUrl);
   const canEmbed = playerUrl && (isHls || isDirect);
@@ -4287,7 +4407,7 @@ function renderLiveStream(entity, event, author) {
       <div class="live-no-stream-text">
         ${isLive
           ? 'No stream URL available. Open in a Nostr client below to watch.'
-          : `This stream has ended.${recording ? `<br><a href="${esc(recording)}" target="_blank" rel="noopener">Watch the recording ↗</a>` : ' No recording available.'}`
+          : `This stream has ended.${recording && safeHttpUrl(recording) ? `<br>${anchor(recording, 'Watch the recording ↗', { className: 'inline-link' })}` : ' No recording available.'}`
         }
       </div>
     </div>`;
@@ -4297,13 +4417,13 @@ function renderLiveStream(entity, event, author) {
   wrap.innerHTML = '<div class="live-wrap" id="entity-content"></div>';
   const container = document.getElementById('entity-content');
 
-  container.innerHTML = `
+  container.innerHTML = sanitize(`
     <div class="live-status-bar">
       ${badgeHtml}
       ${startedText ? `<span class="live-started">${esc(startedText)}</span>` : ''}
     </div>
 
-    ${image && !canEmbed ? `<img class="live-cover" src="${esc(image)}" alt="cover" onerror="this.remove()">` : ''}
+    ${image && !canEmbed ? safeImg(image, { className: 'live-cover', alt: 'cover', onErrorBehavior: 'remove' }) : ''}
 
     <h1 class="live-title">${esc(title)}</h1>
     ${summary ? `<div class="live-summary">${esc(summary)}</div>` : ''}
@@ -4319,7 +4439,7 @@ function renderLiveStream(entity, event, author) {
       <div class="live-participants-list" id="live-participants-list">
         ${participants.map(p => `
           <div class="live-participant" data-pubkey="${esc(p.pubkey)}">
-            <img src="" alt="" style="display:none">
+            <img src="" alt="" class="u-hidden">
             <div>
               <div class="live-participant-name">${esc(p.petname || truncate(p.pubkey, 10))}</div>
               ${p.role ? `<div class="live-participant-role">${esc(p.role)}</div>` : ''}
@@ -4331,9 +4451,10 @@ function renderLiveStream(entity, event, author) {
     <hr class="divider">
     ${clientSection(entity, 'live')}
     ${rawIdBlock(entity.raw, event.id)}
-  `;
+  `);
 
   showView('entity');
+  wireMediaHandlers(container);
   wireClientMore();
 
   // Wire zap button
@@ -4352,17 +4473,24 @@ function renderLiveStream(entity, event, author) {
     if (videoEl) {
       const wrapEl = document.getElementById('live-player-wrap');
       const onError = () => {
-        if (image) {
+        const safeImage = safeHttpUrl(image);
+        if (safeImage) {
           const img = document.createElement('img');
           img.className = 'live-cover';
           img.alt = 'cover';
-          img.src = image;
+          img.referrerPolicy = 'no-referrer';
+          img.loading = 'lazy';
+          setSafeSrc(img, image);
           img.onerror = () => {
-            img.replaceWith(Object.assign(document.createElement('div'), { innerHTML: noStreamHtml }).firstChild);
+            const frag = document.createElement('div');
+            frag.innerHTML = sanitize(noStreamHtml);
+            if (frag.firstChild) img.replaceWith(frag.firstChild);
           };
           wrapEl.replaceWith(img);
         } else {
-          wrapEl.outerHTML = noStreamHtml;
+          const frag = document.createElement('div');
+          frag.innerHTML = sanitize(noStreamHtml);
+          if (frag.firstChild) wrapEl.replaceWith(frag.firstChild);
         }
       };
       if (isHls && Hls.isSupported()) {
@@ -4371,8 +4499,8 @@ function renderLiveStream(entity, event, author) {
         hls.attachMedia(videoEl);
         hls.on(Hls.Events.ERROR, (e, data) => { if (data.fatal) onError(); });
       } else if (videoEl.canPlayType('application/vnd.apple.mpegurl') || isDirect) {
-        // Safari native HLS or direct video
-        videoEl.src = playerUrl;
+        // Safari native HLS or direct video. playerUrl already passed safeHttpUrl above.
+        setSafeSrc(videoEl, playerUrl);
         videoEl.addEventListener('error', onError);
       } else {
         onError();
@@ -4393,10 +4521,12 @@ function renderLiveStream(entity, event, author) {
       const avatarEl = document.getElementById('live-host-avatar');
       const avatarPh = document.getElementById('live-host-avatar-ph');
       if (nameEl && (meta.display_name || meta.name)) nameEl.textContent = meta.display_name || meta.name;
-      if (meta.picture) {
+      if (meta.picture && safeHttpUrl(meta.picture)) {
         const img = document.createElement('img');
-        img.src = meta.picture;
-        img.style.cssText = 'width:18px;height:18px;border-radius:3px;object-fit:cover;margin-right:4px';
+        img.className = 'u-avatar-xs';
+        img.referrerPolicy = 'no-referrer';
+        img.loading = 'lazy';
+        setSafeSrc(img, meta.picture);
         img.onerror = () => img.remove();
         if (avatarEl) avatarEl.replaceWith(img);
         else if (avatarPh) avatarPh.replaceWith(img);
@@ -4416,8 +4546,9 @@ function renderLiveStream(entity, event, author) {
       if (nameEl && (meta.display_name || meta.name)) {
         nameEl.textContent = meta.display_name || meta.name;
       }
-      if (imgEl && meta.picture) {
-        imgEl.src = meta.picture;
+      if (imgEl && meta.picture && setSafeSrc(imgEl, meta.picture)) {
+        imgEl.referrerPolicy = 'no-referrer';
+        imgEl.loading = 'lazy';
         imgEl.style.display = '';
         imgEl.onerror = () => imgEl.style.display = 'none';
       }
@@ -4439,8 +4570,8 @@ function renderLongform(entity, event, author) {
 
   ensureEntityWrap();
   const container = document.getElementById('entity-content');
-  container.innerHTML = `
-    ${image ? `<img class="profile-banner" src="${esc(image)}" alt="cover" style="margin-bottom:2rem" onerror="this.remove()">` : ''}
+  container.innerHTML = sanitize(`
+    ${safeImg(image, { className: 'profile-banner u-mb-2', alt: 'cover', onErrorBehavior: 'remove' })}
     <h1 class="longform-title">${esc(title)}</h1>
     ${summary ? `<div class="longform-summary">${esc(summary)}</div>` : ''}
     ${authorHeader(name, avatar, ts, authorNpub)}
@@ -4450,7 +4581,8 @@ function renderLongform(entity, event, author) {
     ${author?.lud16 ? `<div class="zap-inline-section"><button class="zap-btn" id="longform-zap-btn">Zap Post</button></div><hr class="divider">` : ''}
     ${clientSection(entity, 'longform')}
     ${rawIdBlock(entity.raw, event.id)}
-  `;
+  `);
+  wireMediaHandlers(container);
   // Wire author header click
   container.querySelectorAll('.note-header-link[data-entity]').forEach(el => {
     el.addEventListener('click', e => { e.preventDefault(); navigate(el.dataset.entity); });
@@ -4473,13 +4605,13 @@ function clientSection(entity, kind) {
   const extraShown  = kind !== 'live'; // show More only for non-live (live has fewer clients)
 
   const nativeBtns = CLIENTS.native.map(c =>
-    `<a class="client-btn${c.primary?' primary':''}" href="${esc(c.url(entity))}"><span class="dot"></span>${esc(c.name)}</a>`
+    anchor(c.url(entity), `<span class="dot"></span>${esc(c.name)}`, { className: `client-btn${c.primary?' primary':''}` })
   ).join('');
   const webBtns = webClients.map(c =>
-    `<a class="client-btn" href="${esc(c.url(entity))}" target="_blank" rel="noopener"><span class="dot"></span>${esc(c.name)}</a>`
+    anchor(c.url(entity), `<span class="dot"></span>${esc(c.name)}`, { className: 'client-btn' })
   ).join('');
   const extraBtns = CLIENTS.extra.filter(c => !c.hideFor || !c.hideFor.includes(kind)).map(c =>
-    `<a class="client-btn" href="${esc(c.url(entity))}" target="_blank" rel="noopener"><span class="dot"></span>${esc(c.name)}</a>`
+    anchor(c.url(entity), `<span class="dot"></span>${esc(c.name)}`, { className: 'client-btn' })
   ).join('');
 
   const moreHtml = extraShown ? `
@@ -4508,7 +4640,7 @@ function rawIdBlock(raw, hex) {
   return `<div class="raw-id-block">
     <div class="raw-id-label">NIP-19 Identifier</div>
     <div class="raw-id-value">${esc(raw)}</div>
-    ${hex && hex !== raw ? `<div class="raw-id-label" style="margin-top:.6rem">Hex</div><div class="raw-id-value">${esc(hex)}</div>` : ''}
+    ${hex && hex !== raw ? `<div class="raw-id-label u-mt-small">Hex</div><div class="raw-id-value">${esc(hex)}</div>` : ''}
   </div>`;
 }
 
@@ -4516,7 +4648,261 @@ function rawIdBlock(raw, hex) {
 function showError(msg) { document.title = 'Error | NostrGate'; document.getElementById('error-msg').textContent = msg; showView('error'); window.scrollTo({top:0,behavior:'instant'}); }
 
 function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;')
+    .replace(/\//g,'&#47;');
+}
+
+// -- URL scheme allowlist helpers --
+// Reject anything the browser could interpret as executable or foreign-origin.
+// `safeUrl` returns a normalized href string, or null if the input is unsafe.
+const CTRL_CHAR_RE = /[\x00-\x1F\x7F]/;
+function safeUrl(u, { allow = ['http','https','mailto','nostr','lightning'] } = {}) {
+  if (u == null) return null;
+  const raw = String(u);
+  if (CTRL_CHAR_RE.test(raw)) return null;
+  let parsed;
+  try { parsed = new URL(raw, location.href); } catch { return null; }
+  const proto = parsed.protocol.replace(/:$/,'').toLowerCase();
+  if (proto === 'javascript' || proto === 'data' || proto === 'blob' || proto === 'filesystem' || proto === 'vbscript') return null;
+  if (!allow.includes(proto)) return null;
+  return parsed.href;
+}
+function safeHttpUrl(u) { return safeUrl(u, { allow: ['http','https'] }); }
+
+// Build the gate loader DOM programmatically. The SVG round-trips through DOMPurify
+// lose their namespace+viewBox fidelity and break the CSS animation; constructing the
+// nodes directly with createElementNS bypasses the sanitizer entirely (static author
+// markup, no user data). Size class: '' | 'gate-loader-sm' | 'gate-loader-md'.
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const GATE_PATH_D = 'M2 36V6Q2 2 6 2H22Q26 2 26 6V36';
+function makeLoaderNode({ sizeClass = '', text = '', wrapperClass = 'feed-loading', as = 'div' } = {}) {
+  const wrap = document.createElement(as === 'span' ? 'span' : 'div');
+  if (wrapperClass) wrap.className = wrapperClass;
+
+  const spin = document.createElement('span');
+  spin.className = 'gate-loader' + (sizeClass ? ' ' + sizeClass : '');
+
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 28 36');
+  for (const cls of ['gate-frame', 'gate-pulse']) {
+    const p = document.createElementNS(SVG_NS, 'path');
+    p.setAttribute('class', cls);
+    p.setAttribute('d', GATE_PATH_D);
+    svg.appendChild(p);
+  }
+  spin.appendChild(svg);
+  wrap.appendChild(spin);
+
+  if (text) {
+    const t = document.createElement('div');
+    t.className = 'loading-text';
+    t.textContent = text;
+    wrap.appendChild(t);
+  }
+  return wrap;
+}
+// Replace innerHTML of an element with a freshly-built loader node.
+function showLoader(el, opts = {}) {
+  if (!el) return;
+  el.replaceChildren(makeLoaderNode(opts));
+}
+// Replace any <span class="ng-spinner ng-spinner-sm|ng-spinner-md"> markers with a DOM-built
+// loader. Size is encoded in a class (not data-*) because our DOMPurify ALLOWED_ATTR doesn't
+// keep `data-size`, but it does keep `class`. Run after innerHTML/sanitize inserts a string
+// containing ng-spinner markers.
+function hydrateSpinners(root) {
+  if (!root) return;
+  const scope = root.nodeType === 1 ? root : document;
+  scope.querySelectorAll('.ng-spinner').forEach(marker => {
+    const size = marker.classList.contains('ng-spinner-md') ? 'gate-loader-md'
+               : marker.classList.contains('ng-spinner-sm') ? 'gate-loader-sm' : '';
+    const spin = document.createElement('span');
+    spin.className = 'gate-loader' + (size ? ' ' + size : '');
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 28 36');
+    for (const cls of ['gate-frame', 'gate-pulse']) {
+      const p = document.createElementNS(SVG_NS, 'path');
+      p.setAttribute('class', cls);
+      p.setAttribute('d', GATE_PATH_D);
+      svg.appendChild(p);
+    }
+    spin.appendChild(svg);
+    marker.replaceWith(spin);
+  });
+}
+
+// Render an <a>. If href is unsafe, degrade to inner text (no link).
+// innerHtml is trusted markup already prepared by the caller.
+function anchor(href, innerHtml, { className = '', title = '', extraRel = '', dataEntity = '' } = {}) {
+  const safe = safeUrl(href);
+  if (!safe) return innerHtml;
+  const cls = className ? ` class="${esc(className)}"` : '';
+  const t = title ? ` title="${esc(title)}"` : '';
+  const de = dataEntity ? ` data-entity="${esc(dataEntity)}"` : '';
+  const rel = extraRel ? `noopener noreferrer ${extraRel}` : 'noopener noreferrer';
+  return `<a${cls} href="${esc(safe)}" target="_blank" rel="${esc(rel)}" referrerpolicy="no-referrer"${t}${de}>${innerHtml}</a>`;
+}
+
+// Render an <img>. Returns empty string if src fails http/https validation.
+// onErrorBehavior = 'hide' | 'remove' | 'remove-parent' | 'avatar-fallback'
+function safeImg(src, { alt = '', className = '', id = '', onErrorBehavior = 'hide', extraAttrs = '' } = {}) {
+  const safe = safeHttpUrl(src);
+  if (!safe) return '';
+  const cls = className ? ` class="${esc(className)}"` : '';
+  const idAttr = id ? ` id="${esc(id)}"` : '';
+  const ex = extraAttrs ? ` ${extraAttrs}` : '';
+  return `<img${cls}${idAttr} src="${esc(safe)}" alt="${esc(alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-on-error="${esc(onErrorBehavior)}"${ex}>`;
+}
+
+// DOM property-setter variants for sites that assign .src / .href directly.
+function setSafeSrc(el, src) {
+  const safe = safeHttpUrl(src);
+  if (safe) { el.setAttribute('src', safe); return true; }
+  el.removeAttribute('src');
+  el.style.display = 'none';
+  return false;
+}
+function setSafeHref(el, href, opts) {
+  const safe = safeUrl(href, opts);
+  if (safe) { el.setAttribute('href', safe); return true; }
+  el.removeAttribute('href');
+  return false;
+}
+// Narrow data: URL setter for locally-generated QR code images only.
+const QR_DATA_URL_RE = /^data:image\/(png|svg\+xml|jpeg);base64,[A-Za-z0-9+/=]+$/;
+function setQrDataUrl(el, dataUrl) {
+  if (typeof dataUrl !== 'string' || !QR_DATA_URL_RE.test(dataUrl)) { el.removeAttribute('src'); return false; }
+  el.setAttribute('src', dataUrl);
+  return true;
+}
+
+// BOLT11 invoice shape check before we plug one into href="lightning:...".
+const BOLT11_RE = /^ln(bc|tb|bcrt)\d+[munp]?1[02-9ac-hj-np-z]{100,}$/i;
+function bolt11Shape(s) { return typeof s === 'string' && BOLT11_RE.test(s) ? s : null; }
+
+// YouTube 11-char video id validator. Returns a pinned nocookie embed URL, or null.
+const YOUTUBE_ID_RE = /^[A-Za-z0-9_-]{11}$/;
+function youtubeEmbedUrl(id) {
+  return YOUTUBE_ID_RE.test(id) ? `https://www.youtube-nocookie.com/embed/${id}` : null;
+}
+
+// Attach error-handler behavior to elements carrying data-on-error.
+// Also hydrate any <span class="ng-spinner"> markers into real DOM-built loaders.
+// Called after every dynamic innerHTML assignment that may contain user media.
+function wireMediaHandlers(root) {
+  if (!root) return;
+  hydrateSpinners(root);
+  const scope = root.nodeType === 1 ? root : document;
+  const els = scope.querySelectorAll ? scope.querySelectorAll('[data-on-error]') : [];
+  els.forEach(el => {
+    if (el.__ngErrWired) return;
+    el.__ngErrWired = true;
+    el.addEventListener('error', () => {
+      switch (el.dataset.onError) {
+        case 'remove':        el.remove(); break;
+        case 'remove-parent': el.parentElement && el.parentElement.remove(); break;
+        case 'avatar-fallback': {
+          el.style.display = 'none';
+          const sib = el.nextElementSibling;
+          if (sib) sib.style.display = 'flex';
+          break;
+        }
+        case 'hide':
+        default:              el.style.display = 'none'; break;
+      }
+    }, { once: true });
+  });
+}
+
+// -- DOMPurify configuration --
+// Strict allowlist for user-derived HTML. `style` is intentionally absent because
+// all inline styles in dynamic templates were extracted to utility CSS classes.
+const DP_CONFIG = {
+  default: {
+    ALLOWED_TAGS: ['a','b','i','em','strong','u','s','del','br','p','div','span','button',
+      'ul','ol','li','blockquote','code','pre','h1','h2','h3','h4','h5','h6','hr',
+      'img','video','audio','iframe','source','table','thead','tbody','tr','td','th',
+      // SVG subset used by the loading spinner and similar static decoration
+      'svg','path','g','circle','rect','polygon','line'],
+    ALLOWED_ATTR: ['href','src','alt','title','class','id','target','rel','loading',
+      'referrerpolicy','decoding','controls','playsinline','preload','autoplay','muted','poster',
+      'data-entity','data-nip05','data-nip05-pubkey','data-on-error','data-pubkey',
+      'width','height','aria-label','aria-expanded','sandbox','allow','allowfullscreen','frameborder',
+      // SVG attrs
+      'viewBox','d','fill','stroke','stroke-width','cx','cy','r','points','x','y','x1','y1','x2','y2','preserveAspectRatio','xmlns'],
+    ALLOWED_URI_REGEXP: /^(?:https?:|mailto:|nostr:|lightning:|#)/i,
+    FORBID_TAGS: ['script','style','form','object','embed','meta','link','base','math','foreignObject','use'],
+    ADD_URI_SAFE_ATTR: ['data-entity','data-nip05','data-nip05-pubkey','data-pubkey','data-on-error'],
+    ALLOW_UNKNOWN_PROTOCOLS: false,
+    SANITIZE_DOM: true,
+    // SANITIZE_NAMED_PROPS would prefix every id= with "user-content-", breaking the app's
+    // many getElementById lookups. All id values in dynamic templates are author-controlled
+    // static strings (never derived from Nostr event fields), so the DOM-clobbering risk is nil.
+    SANITIZE_NAMED_PROPS: false,
+    KEEP_CONTENT: true,
+  },
+  quote: {
+    ALLOWED_TAGS: ['a','b','i','em','strong','u','s','del','br','p','div','span','img'],
+    ALLOWED_ATTR: ['href','src','alt','title','class','id','target','rel','loading',
+      'referrerpolicy','decoding','data-entity','data-nip05','data-on-error','data-pubkey'],
+    ALLOWED_URI_REGEXP: /^(?:https?:|nostr:|#)/i,
+    FORBID_TAGS: ['script','style','form','object','embed','meta','link','base','math','svg','iframe','video','audio'],
+    ADD_URI_SAFE_ATTR: ['data-entity','data-nip05','data-pubkey','data-on-error'],
+    ALLOW_UNKNOWN_PROTOCOLS: false,
+  },
+  strip: { ALLOWED_TAGS: [], ALLOWED_ATTR: [] },
+};
+
+// Iframe hook: only accept pinned YouTube nocookie embeds, force sandbox.
+DOMPurify.addHook('uponSanitizeElement', (node, data) => {
+  if (data.tagName === 'iframe') {
+    const src = node.getAttribute('src') || '';
+    if (!/^https:\/\/www\.youtube-nocookie\.com\/embed\/[A-Za-z0-9_-]{11}(?:\?.*)?$/.test(src)) {
+      node.parentNode && node.parentNode.removeChild(node);
+      return;
+    }
+    node.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+    node.setAttribute('referrerpolicy', 'no-referrer');
+    node.setAttribute('allow', 'encrypted-media; picture-in-picture; fullscreen');
+    node.setAttribute('loading', 'lazy');
+  }
+});
+
+// Anchor hook: force noreferrer/no-referrer/no-opener on absolute http(s) links.
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if (node.tagName === 'A') {
+    const href = node.getAttribute('href') || '';
+    if (/^https?:/i.test(href)) {
+      node.setAttribute('rel', 'noopener noreferrer');
+      node.setAttribute('referrerpolicy', 'no-referrer');
+      if (!node.getAttribute('target')) node.setAttribute('target', '_blank');
+    }
+  }
+  if (node.tagName === 'IMG' && !node.hasAttribute('referrerpolicy')) {
+    node.setAttribute('referrerpolicy', 'no-referrer');
+  }
+});
+
+// TrustedTypes policies.
+// DOMPurify itself creates and owns the 'dompurify' policy when TT is enforced; don't create it here.
+// We only create a 'default' policy so bare-string innerHTML/outerHTML assignments (static loading
+// spinners etc.) transparently flow through DOMPurify.
+if (typeof window !== 'undefined' && window.trustedTypes && typeof window.trustedTypes.createPolicy === 'function') {
+  try {
+    window.trustedTypes.createPolicy('default', {
+      createHTML: (input) => DOMPurify.sanitize(String(input), DP_CONFIG.default, { RETURN_TRUSTED_TYPE: false }),
+      createScriptURL: (input) => input,  // module imports are already SRI-pinned
+      createScript: () => { throw new Error('createScript is forbidden'); },
+    });
+  } catch { /* default policy already exists (hot reload, etc.) */ }
+}
+
+function sanitize(html, profile = 'default') {
+  const cfg = DP_CONFIG[profile] || DP_CONFIG.default;
+  // DOMPurify returns TrustedHTML automatically when TT is enforced, satisfying require-trusted-types-for 'script'.
+  return DOMPurify.sanitize(String(html || ''), cfg);
 }
 
 function truncate(s, n) { return s.length > n ? s.slice(0,n)+'…' : s; }
@@ -4527,10 +4913,8 @@ function displayName(meta, pubkey, len = 12) {
 
 function avatarHTML(avatar, name, imgClass, phClass) {
   const initial = esc((name || '?')[0].toUpperCase());
-  const img = avatar
-    ? `<img class="${imgClass}" src="${esc(avatar)}" alt="${esc(name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-    : '';
-  const ph = `<div class="${phClass}" ${avatar ? 'style="display:none"' : ''}>${initial}</div>`;
+  const img = safeImg(avatar, { className: imgClass, alt: name || '', onErrorBehavior: 'avatar-fallback' });
+  const ph = `<div class="${phClass}${img ? ' u-hidden' : ''}">${initial}</div>`;
   return img + ph;
 }
 
@@ -4557,7 +4941,8 @@ function linkify(text) {
   let m;
   while ((m = urlRe.exec(text)) !== null) {
     result += esc(text.slice(last, m.index));
-    result += `<a class="inline-link" href="${esc(m[0])}" target="_blank" rel="noopener">${esc(m[0])}</a>`;
+    const safe = safeHttpUrl(m[0]);
+    result += safe ? anchor(safe, esc(safe), { className: 'inline-link' }) : esc(m[0]);
     last = m.index + m[0].length;
   }
   result += esc(text.slice(last));
@@ -4593,7 +4978,8 @@ function renderBio(text, mentionProfiles = {}) {
         result += esc(token);
       }
     } else {
-      result += `<a class="inline-link" href="${esc(token)}" target="_blank" rel="noopener">${esc(token)}</a>`;
+      const safe = safeHttpUrl(token);
+      result += safe ? anchor(safe, esc(safe), { className: 'inline-link' }) : esc(token);
     }
     last = m.index + m[0].length;
   }
@@ -4616,17 +5002,19 @@ marked.setOptions({ breaks: true, gfm: true });
 
 const markedRenderer = new marked.Renderer();
 
-// Security: only allow http/https links, open in new tab
+// Security: only allow http/https links, open in new tab. safeHttpUrl enforces the scheme allowlist.
 markedRenderer.link = ({ href, title, text }) => {
-  if (!/^https?:\/\//i.test(href)) return text;
+  const safe = safeHttpUrl(href);
+  if (!safe) return text;
   const t = title ? ` title="${esc(title)}"` : '';
-  return `<a href="${esc(href)}"${t} target="_blank" rel="noopener">${text}</a>`;
+  return `<a href="${esc(safe)}"${t} target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">${text}</a>`;
 };
 
 // Image rendering with styling
 markedRenderer.image = ({ href, title, text }) => {
-  if (!/^https?:\/\//i.test(href)) return esc(text);
-  return `<img src="${esc(href)}" alt="${esc(text)}" class="inline-img" loading="lazy">`;
+  const safe = safeHttpUrl(href);
+  if (!safe) return esc(text);
+  return safeImg(safe, { className: 'inline-img', alt: text || '' });
 };
 
 // Escape raw HTML tokens to prevent XSS from user content
@@ -4636,11 +5024,14 @@ marked.use({ renderer: markedRenderer });
 
 function renderMarkdown(md) {
   let html = marked.parse(md);
-  // Post-process: promote bare-URL <a> tags to <img>/<video>/<audio> when appropriate
+  // Post-process: promote bare-URL <a> tags to <img>/<video>/<audio> when appropriate.
+  // URLs were emitted by marked's link renderer, which already ran safeHttpUrl; re-validate defensively.
   html = html.replace(/<a href="([^"]+)"[^>]*>\1<\/a>/g, (match, url) => {
-    if (IMAGE_EXTS.test(url)) return `<img src="${esc(url)}" class="inline-img" loading="lazy">`;
-    if (VIDEO_EXTS.test(url)) return `<div class="media-block"><video class="inline-video" controls src="${esc(url)}"></video></div>`;
-    if (AUDIO_EXTS.test(url)) return `<audio controls src="${esc(url)}" class="inline-audio"></audio>`;
+    const safe = safeHttpUrl(url);
+    if (!safe) return match;
+    if (IMAGE_EXTS.test(safe)) return safeImg(safe, { className: 'inline-img', alt: '' });
+    if (VIDEO_EXTS.test(safe)) return `<div class="media-block"><video class="inline-video" controls src="${esc(safe)}" data-on-error="remove-parent"></video></div>`;
+    if (AUDIO_EXTS.test(safe)) return `<audio controls src="${esc(safe)}" class="inline-audio" data-on-error="remove"></audio>`;
     return match;
   });
   return html;
@@ -4683,14 +5074,20 @@ function publishNostrGateProfile(sk, pk) {
 }
 
 async function fetchLnurlPayEndpoint(lud16) {
+  if (typeof lud16 !== 'string') throw new Error('Invalid lightning address format');
   const parts = lud16.split('@');
   if (parts.length !== 2) throw new Error('Invalid lightning address format');
   const [name, domain] = parts;
-  const res = await fetch(`https://${domain}/.well-known/lnurlp/${name}`);
+  if (!NIP05_NAME_RE.test(name) || !NIP05_DOMAIN_RE.test(domain)) {
+    throw new Error('Invalid lightning address format');
+  }
+  const res = await fetch(`https://${domain}/.well-known/lnurlp/${encodeURIComponent(name)}`, {
+    redirect: 'error', referrerPolicy: 'no-referrer'
+  });
   if (!res.ok) throw new Error(`Lightning provider returned ${res.status}`);
   const data = await res.json();
   if (data.status === 'ERROR') throw new Error(data.reason || 'Lightning provider error');
-  if (!data.callback) throw new Error('Lightning provider missing callback URL');
+  if (!data.callback || !safeHttpUrl(data.callback)) throw new Error('Lightning provider returned invalid callback URL');
   return data;
 }
 
@@ -4712,12 +5109,14 @@ function createZapRequest(recipientPubkey, eventId, amount, message, sk, pk) {
 }
 
 async function requestInvoice(lnurlData, zapRequest, amountMsats) {
+  const callback = safeHttpUrl(lnurlData.callback);
+  if (!callback) throw new Error('Invalid callback URL');
   const encoded = encodeURIComponent(JSON.stringify(zapRequest));
-  let url = `${lnurlData.callback}${lnurlData.callback.includes('?') ? '&' : '?'}amount=${amountMsats}`;
+  let url = `${callback}${callback.includes('?') ? '&' : '?'}amount=${amountMsats}`;
   if (lnurlData.allowsNostr && lnurlData.nostrPubkey) {
     url += `&nostr=${encoded}`;
   }
-  const res = await fetch(url);
+  const res = await fetch(url, { redirect: 'error', referrerPolicy: 'no-referrer' });
   if (!res.ok) throw new Error(`Invoice request failed (${res.status})`);
   const data = await res.json();
   if (data.status === 'ERROR') throw new Error(data.reason || 'Invoice request error');
@@ -4745,10 +5144,11 @@ function openZapModal(recipientPubkey, lud16, eventId, recipientName, recipientA
 
   // Set recipient info
   const avatarEl = document.getElementById('zap-recipient-avatar');
-  if (recipientAvatar) {
-    avatarEl.src = recipientAvatar;
+  if (recipientAvatar && setSafeSrc(avatarEl, recipientAvatar)) {
+    avatarEl.referrerPolicy = 'no-referrer';
     avatarEl.style.display = '';
   } else {
+    avatarEl.removeAttribute('src');
     avatarEl.style.display = 'none';
   }
   document.getElementById('zap-recipient-name').textContent = recipientName || 'Anonymous';
@@ -4839,18 +5239,20 @@ async function handleZapSend() {
     publishNostrGateProfile(sk, pk); // fire & forget
 
     const zapReq = createZapRequest(zapState.recipientPubkey, zapState.eventId, amount, message, sk, pk);
-    const bolt11 = await requestInvoice(lnurlData, zapReq, msats);
+    const bolt11Raw = await requestInvoice(lnurlData, zapReq, msats);
+    const bolt11 = bolt11Shape(bolt11Raw);
+    if (!bolt11) throw new Error('Invalid invoice returned by provider');
     zapState.bolt11 = bolt11;
 
-    // Generate QR
+    // Generate QR (locally produced data: URL; validated by shape before assignment)
     const qrDataUrl = await QRCode.toDataURL(bolt11.toUpperCase(), { width: 480, margin: 0, color: { dark: '#000', light: '#fff' } });
-    document.getElementById('zap-qr-img').src = qrDataUrl;
+    setQrDataUrl(document.getElementById('zap-qr-img'), qrDataUrl);
 
     // Set amount display
     document.getElementById('zap-invoice-sats').textContent = amount.toLocaleString();
 
-    // Set Open in App href
-    document.getElementById('zap-open-app').href = `lightning:${bolt11}`;
+    // Set Open in App href (lightning: scheme, bolt11 already shape-validated)
+    setSafeHref(document.getElementById('zap-open-app'), `lightning:${bolt11}`, { allow: ['lightning'] });
 
     zapShowStep('invoice');
 
@@ -4863,6 +5265,9 @@ async function handleZapSend() {
 }
 
 async function init() {
+  // Wire any static data-on-error elements (zap recipient avatar, etc.)
+  wireMediaHandlers(document.body);
+
   document.getElementById('logo-btn').addEventListener('click', goHome);
   document.getElementById('error-back').addEventListener('click', goHome);
 
@@ -4951,7 +5356,7 @@ async function init() {
   // Show "NostrGate built by" on third-party hosts
   if (!location.hostname.endsWith('nostrgate.com')) {
     const builtBy = document.getElementById('footer-built-by');
-    if (builtBy) builtBy.innerHTML = `<a href="https://nostrgate.com" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none">NostrGate</a> built by <a href="#" data-entity="npub1x5t34kxd79m657qcuwp4zrypy9t8t4e6yks5zapjvau29t0xvgaqakh2p2" class="footer-nostr-link">5t34k</a>`;
+    if (builtBy) builtBy.innerHTML = `<a href="https://nostrgate.com" target="_blank" rel="noopener noreferrer" class="u-accent-link">NostrGate</a> built by <a href="#" data-entity="npub1x5t34kxd79m657qcuwp4zrypy9t8t4e6yks5zapjvau29t0xvgaqakh2p2" class="footer-nostr-link">5t34k</a>`;
   }
 
   // Footer nostr profile links (after innerHTML replacement so new elements are wired)
@@ -5038,7 +5443,7 @@ init();
     <div class="zap-eyebrow">// ZAP</div>
     <div class="zap-title">SEND SATS</div>
     <div class="zap-recipient" id="zap-recipient">
-      <img class="zap-recipient-avatar" id="zap-recipient-avatar" src="" alt="" onerror="this.style.display='none'">
+      <img class="zap-recipient-avatar" id="zap-recipient-avatar" src="" alt="" data-on-error="hide">
       <span id="zap-recipient-name"></span>
     </div>
 
@@ -5107,15 +5512,15 @@ init();
     <div class="footer-links">
       <button class="footer-btn primary" id="footer-about-btn">About</button>
       <div class="footer-sep"></div>
-      <a class="footer-btn" href="https://github.com/5t34k/nostrgate" target="_blank" rel="noopener" id="footer-github-btn">
+      <a class="footer-btn" href="https://github.com/5t34k/nostrgate" target="_blank" rel="noopener noreferrer" id="footer-github-btn">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
         GitHub
       </a>
     </div>
     <div class="footer-credit">
-      <span>Built on <a href="https://github.com/nostr-protocol/nostr" target="_blank" rel="noopener">Nostr</a></span>
-      <span>Powered by <a href="https://github.com/nbd-wtf/nostr-tools" target="_blank" rel="noopener">nostr-tools</a></span>
-      <span>Inspired by <a href="https://njump.me" target="_blank" rel="noopener">njump</a> by <a href="#" data-entity="npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6" class="footer-nostr-link">fiatjaf</a></span>
+      <span>Built on <a href="https://github.com/nostr-protocol/nostr" target="_blank" rel="noopener noreferrer">Nostr</a></span>
+      <span>Powered by <a href="https://github.com/nbd-wtf/nostr-tools" target="_blank" rel="noopener noreferrer">nostr-tools</a></span>
+      <span>Inspired by <a href="https://njump.me" target="_blank" rel="noopener noreferrer">njump</a> by <a href="#" data-entity="npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6" class="footer-nostr-link">fiatjaf</a></span>
       <span id="footer-built-by">Built by <a href="#" data-entity="npub1x5t34kxd79m657qcuwp4zrypy9t8t4e6yks5zapjvau29t0xvgaqakh2p2" class="footer-nostr-link">5t34k</a></span>
       <span style="margin-left:auto;color:var(--muted2)">The open web awaits.</span>
     </div>
